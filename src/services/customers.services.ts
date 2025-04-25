@@ -85,8 +85,6 @@ class CustomersService {
 
   //Lay access_token và id_token từ google
   private async getOauthGoogleToken(code: string) {
-    console.log(code)
-
     const body = {
       code,
       client_id: process.env.GOOGLE_CLIENT_ID,
@@ -131,8 +129,6 @@ class CustomersService {
   async ouath(code: string) {
     const { access_token, id_token } = await this.getOauthGoogleToken(code)
     const userInfo = await this.getGoogleUserInfo(access_token, id_token)
-    console.log('userInfo: ', userInfo)
-
     if (!userInfo.verified_email) {
       throw new ErrorWithStatus({
         message: CUSTOMERS_MESSAGES.GMAIL_NOT_VERIFIED,
@@ -140,7 +136,16 @@ class CustomersService {
       })
     }
     //Kiem tra email đã được đăng ký hay chưa
-    const customer = await databaseService.customers.findOne({ email: userInfo.email })
+    const customer = await databaseService.customers.findOne(
+      { email: userInfo.email },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0
+        }
+      }
+    )
     //Nếu tồn tại cho login vào
     if (customer) {
       const [access_token, refresh_token] = await this.signAccessTokenAndRefreshToken({
@@ -156,6 +161,7 @@ class CustomersService {
       return {
         access_token,
         refresh_token,
+        customer,
         newUser: 0
       }
     } else {
@@ -166,9 +172,19 @@ class CustomersService {
         password,
         confirm_password: password
       })
-
+      const customer = await databaseService.customers.findOne(
+        { email: userInfo.email },
+        {
+          projection: {
+            password: 0,
+            email_verify_token: 0,
+            forgot_password_token: 0
+          }
+        }
+      )
       return {
         ...data,
+        customer,
         newUser: 1
       }
     }
@@ -219,7 +235,7 @@ class CustomersService {
     return {
       access_token,
       expires: process.env.ACCESS_TOKEN_EXPIRES_IN,
-      customer: customer,
+      customer,
       refresh_token
     }
   }
@@ -364,13 +380,7 @@ class CustomersService {
     verify: UserVerifyStatus
     email: string
   }) {
-    console.log('customer_id', customer_id)
-    console.log('verify', verify)
-    console.log('email', email)
-
     const forgot_password_token = await this.signFogotPasswordToken({ customer_id, verify })
-    console.log(forgot_password_token)
-
     await databaseService.customers.updateOne({ _id: new ObjectId(customer_id) }, [
       {
         $set: {
@@ -379,7 +389,7 @@ class CustomersService {
         }
       }
     ])
-    //Gửi email kèm đường link đến email người dùng: http://localhost:3000/forgot-password?token=forgot_password_token
+    //Gửi email kèm đường link đến email người dùng: http://localhost:3000/auth/forgot-password?token=forgot_password_token
     await sendForgotPasswordEmail(email, forgot_password_token)
   }
 

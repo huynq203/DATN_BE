@@ -19,9 +19,14 @@ export interface LogoutUserResBody {
 }
 
 export interface UpdateUserReqBody {
+  user_id: string
   name?: string
   email?: string
   phone?: string
   date_of_birth?: Date
   address?: string
+}
+
+export interface DeleteUserReqBody {
+  user_id: string
 }

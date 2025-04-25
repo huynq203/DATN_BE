@@ -25,6 +25,7 @@ export const verifyAccessToken = async (access_token: string, req?: Request) => 
       req.decoded_authorization = decoded_authorization
       return true
     }
+
     return decoded_authorization
   } catch (error) {
     if (error instanceof JsonWebTokenError) {

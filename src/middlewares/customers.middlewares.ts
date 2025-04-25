@@ -3,14 +3,14 @@ import { checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { capitalize } from 'lodash'
 import HTTP_STATUS from '~/constants/httpStatus'
-import { COMMONS_MESSAGES, CUSTOMERS_MESSAGES } from '~/constants/messages'
+import { COMMONS_MESSAGES, CUSTOMERS_MESSAGES, JWT_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Error'
 import databaseService from '~/services/database.services'
 import customerService from '~/services/customers.services'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
-import { confirmPasswordSchema, dateOfBirthSchema, nameSchema, PasswordSchema } from './commons.middlewares'
+import { confirmPasswordSchema, dateOfBirthSchema, nameSchema, passwordSchema } from './commons.middlewares'
 import { UserVerifyStatus } from '~/constants/enums'
 import { TokenPayload } from '~/models/requests/Customer.requests'
 import { ObjectId } from 'mongodb'
@@ -152,7 +152,7 @@ export const registerValidator = validate(
           }
         }
       },
-      password: PasswordSchema,
+      password: passwordSchema,
       confirm_password: confirmPasswordSchema
     },
     ['body']
@@ -246,7 +246,7 @@ export const forgotPasswordValidator = validate(
           options: async (value, { req }) => {
             const customer = await databaseService.customers.findOne({ email: value })
             if (customer === null) {
-              throw new Error(CUSTOMERS_MESSAGES.CUSTOMER_NOT_FOUND)
+              throw new Error(CUSTOMERS_MESSAGES.EMAIL_NOT_FOUND)
             }
             req.customer = customer
             return true
@@ -294,7 +294,7 @@ export const verifyForgotPasswordTokenValidator = validate(
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
-                  message: capitalize(error.message),
+                  message: capitalize(JWT_MESSAGES.JWT_EXPRIED),
                   status: HTTP_STATUS.UNAUTHORIZED
                 })
               }
@@ -324,7 +324,7 @@ export const changePasswordValidator = validate(
   checkSchema(
     {
       old_password: {
-        ...PasswordSchema,
+        ...passwordSchema,
         custom: {
           options: async (value, { req }) => {
             const { customer_id } = req.decoded_authorization as TokenPayload

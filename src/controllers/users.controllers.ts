@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { COMMONS_MESSAGES, USERS_MESSAGES } from '~/constants/messages'
 import {
   CreateUserReqBody,
+  DeleteUserReqBody,
   LoginUserReqBody,
   LogoutUserResBody,
   UpdateUserReqBody
@@ -55,10 +56,9 @@ export const createUserController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const result = await usersService.createUser(req.body)
-
+  const { role } = req.decoded_authorization as TokenPayload
+  const result = await usersService.createUser({ payload: req.body, role_id: role })
   res.json({
-    message: USERS_MESSAGES.CREATE_SUCCESS,
     result
   })
   return
@@ -71,6 +71,17 @@ export const updateUserController = async (
 ) => {
   res.json({
     message: USERS_MESSAGES.UPDATE_PROFILE_SUCCESS
+  })
+  return
+}
+
+export const deleteUserController = async (
+  req: Request<ParamsDictionary, any, DeleteUserReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  res.json({
+    message: USERS_MESSAGES.DELETE_SUCCESS
   })
   return
 }

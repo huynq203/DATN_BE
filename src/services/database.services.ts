@@ -5,6 +5,8 @@ import Customer from '~/models/schemas/Customer.schemas'
 import User from '~/models/schemas/User.schemas'
 import Role from '~/models/schemas/Roles.schemas'
 import Address from '~/models/schemas/Addresses.schemas'
+import Category from '~/models/schemas/Category.schema'
+import Product from '~/models/schemas/Product.schema'
 dotenv.config()
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@datn.phpnw.mongodb.net/?retryWrites=true&w=majority&appName=DATN`
 class DatabaseService {
@@ -37,6 +39,12 @@ class DatabaseService {
   }
   get refreshTokens(): Collection<RefreshToken> {
     return this.db.collection(process.env.DB_REFRESH_TOKENS_COLLECTION as string)
+  }
+  get categories(): Collection<Category> {
+    return this.db.collection(process.env.DB_CATEGORIES_COLLECTION as string)
+  }
+  get products(): Collection<Product> {
+    return this.db.collection(process.env.DB_PRODUCTS_COLLECTION as string)
   }
 }
 

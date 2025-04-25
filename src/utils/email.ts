@@ -74,10 +74,10 @@ export const sendVerifyRegisterEmail = (
     toAddress,
     'Verify your email',
     template
-      .replace('{{title}}', 'Please verify your email')
-      .replace('{{content}}', 'Click the button below to verify your email')
-      .replace('{{titleLink}}', 'Verify email')
-      .replace('{{link}}', `${process.env.CLIENT_URL}/verify-email?token=${email_verify_token}`)
+      .replace('{{title}}', 'Vui lòng xác thực Email của bạn')
+      .replace('{{content}}', 'Ấn nút bên dưới để xác thực email của bạn')
+      .replace('{{titleLink}}', 'Xác thực email')
+      .replace('{{link}}', `${process.env.CLIENT_URL}/auth/verify-email?token=${email_verify_token}`)
   )
 }
 
@@ -90,9 +90,9 @@ export const sendForgotPasswordEmail = (
     toAddress,
     'Forgot password',
     template
-      .replace('{{title}}', 'You are receiving this email because you have requested to reset your password')
-      .replace('{{content}}', 'Click the button below to reset your password')
-      .replace('{{titleLink}}', 'Reset password')
-      .replace('{{link}}', `${process.env.CLIENT_URL}/forgot-password?token=${forgot_password_token}`)
+      .replace('{{title}}', 'Bạn nhận được email này vì bạn đã yêu cầu đặt lại mật khẩu của mình')
+      .replace('{{content}}', 'Nhấp vào nút bên dưới để đặt lại mật khẩu của bạn')
+      .replace('{{titleLink}}', 'Đặt lại mật khẩu')
+      .replace('{{link}}', `${process.env.CLIENT_URL}/auth/verify-forgot-password?token=${forgot_password_token}`)
   )
 }

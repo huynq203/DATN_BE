@@ -1,7 +1,7 @@
 import { checkSchema } from 'express-validator'
 import { COMMONS_MESSAGES } from '~/constants/messages'
 import { validate } from '~/utils/validation'
-import { confirmPasswordSchema, dateOfBirthSchema, nameSchema, PasswordSchema } from './commons.middlewares'
+import { confirmPasswordSchema, dateOfBirthSchema, nameSchema, passwordSchema } from './commons.middlewares'
 import usersService from '~/services/users.services'
 import databaseService from '~/services/database.services'
 import { hashPassword } from '~/utils/crypto'
@@ -86,7 +86,58 @@ export const createUserValidator = validate(
         }
       },
       date_of_birth: dateOfBirthSchema,
-      password: PasswordSchema,
+      password: passwordSchema,
+      confirm_password: confirmPasswordSchema
+    },
+    ['body']
+  )
+)
+
+export const updateUserValidator = validate(
+  checkSchema(
+    {
+      name: nameSchema,
+      email: {
+        isEmail: {
+          errorMessage: COMMONS_MESSAGES.EMAIL_IS_INVALID
+        },
+        trim: true,
+        custom: {
+          options: async (value) => {
+            const isEmailExist = await usersService.checkEmailUserExist(value)
+            if (isEmailExist) {
+              throw new Error(COMMONS_MESSAGES.EMAIL_ALREADY_EXISTS)
+            }
+            return true
+          }
+        }
+      },
+      phone: {
+        notEmpty: {
+          errorMessage: COMMONS_MESSAGES.PHONE_IS_REQUIRED
+        },
+        trim: true,
+        isLength: {
+          options: {
+            max: 10
+          },
+          errorMessage: COMMONS_MESSAGES.PHONE_IS_INVALID
+        },
+        custom: {
+          options: async (value) => {
+            const regexPhoneNumber = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g
+            if (value.length !== 10 || !regexPhoneNumber.test(value)) {
+              throw new Error(COMMONS_MESSAGES.PHONE_IS_INVALID)
+            }
+            const phone = await usersService.checkPhoneUserExist(value)
+            if (phone) {
+              throw new Error(COMMONS_MESSAGES.PHONE_IS_EXISTS)
+            }
+          }
+        }
+      },
+      date_of_birth: dateOfBirthSchema,
+      password: passwordSchema,
       confirm_password: confirmPasswordSchema
     },
     ['body']

@@ -40,8 +40,6 @@ export const loginController = async (
   res: Response,
   next: NextFunction
 ) => {
-
-
   const customer = req.customer as Customer
   const customer_id = customer._id as ObjectId
   const verify = customer.verify as UserVerifyStatus
@@ -56,7 +54,7 @@ export const loginController = async (
 export const oauthController = async (req: Request, res: Response) => {
   const { code } = req.query
   const result = await customersService.ouath(code as string)
-  const urlRedirect = `${process.env.CLIENT_REDIRECT_CALLBACK as string}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&newUser=${result.newUser}`
+  const urlRedirect = `${process.env.CLIENT_REDIRECT_CALLBACK as string}?access_token=${result.access_token}&refresh_token=${result.refresh_token}&newUser=${result.newUser}&customer=${JSON.stringify(result.customer)}`
   res.redirect(urlRedirect)
   return
 }
@@ -153,14 +151,14 @@ export const forgotPasswordController = async (
   next: NextFunction
 ) => {
   const { _id, verify, email } = req.customer as Customer
-  const result = await customersService.forgotPassword({
+  await customersService.forgotPassword({
     customer_id: (_id as ObjectId).toString(),
     verify: verify,
     email
   })
+
   res.json({
-    message: CUSTOMERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD,
-    result
+    message: CUSTOMERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD
   })
   return
 }
@@ -170,8 +168,6 @@ export const verifyForgotPasswordController = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(req.decoded_password_verify_token)
-
   res.json({
     message: CUSTOMERS_MESSAGES.VERIFY_FORGOT_PASSWORD_SUCCESS
   })
@@ -185,6 +181,8 @@ export const resetPasswordController = async (
 ) => {
   const { customer_id } = req.decoded_password_verify_token as TokenPayload
   const { password } = req.body
+  console.log('customer_id', customer_id)
+
   await customersService.resetPassword(customer_id, password)
   res.json({
     message: CUSTOMERS_MESSAGES.RESET_PASSWORD_SUCCESS

@@ -1,3 +1,9 @@
+import { DES } from 'crypto-js'
+
+export const JWT_MESSAGES = {
+  JWT_EXPRIED: 'JWT hết hạn'
+} as const
+
 export const VALIDATION_MESSAGES = {
   VALIDATION_ERROR: 'Validation error'
 } as const
@@ -41,10 +47,10 @@ export const CUSTOMERS_MESSAGES = {
   CUSTOMER_NOT_VERIFIED: 'Khách hàng chưa xác thực Email',
   UPDATE_ME_SUCCESS: 'Cập nhật thông tin thành công',
   EMAIL_IS_INVALID: 'Email không hợp lệ',
-  CHECK_EMAIL_TO_RESET_PASSWORD: 'Vui lòng kiểm tra email để đặt lại mật khẩu',
-  FORGOT_PASSWORD_TOKEN_IS_REQUIRED: 'Forgot password token không hợp lệ',
-  INVALID_FORGOT_PASSWORD_TOKEN: 'Forgot password token không hợp lệ',
-  VERIFY_FORGOT_PASSWORD_SUCCESS: 'Xác thực quên mật khẩu thành công',
+  CHECK_EMAIL_TO_RESET_PASSWORD: 'Vui lòng kiểm tra hộp thư email để đặt lại mật khẩu',
+  FORGOT_PASSWORD_TOKEN_IS_REQUIRED: 'Token không hợp lệ',
+  INVALID_FORGOT_PASSWORD_TOKEN: 'Token không hợp lệ',
+  VERIFY_FORGOT_PASSWORD_SUCCESS: 'Xác thực token thành công',
   PASSWORD_IS_REQUIRED: ' Mật khẩu không để trống',
   PASSWORD_MUST_BE_A_STRING: 'Mật khẩu phải là một chuỗi',
   PASSWORD_LENGHT_MUST_BE_FROM_6_to_50: 'Độ dài mật khẩu từ 6 đến 50 ký tự',
@@ -58,12 +64,15 @@ export const CUSTOMERS_MESSAGES = {
   OLD_PASSWORD_NOT_MATCH: 'Mật khẩu cũ không đúng',
   CHANGE_PASSWORD_SUCCESS: 'Đổi mật khẩu thành công',
   GET_ME_SUCCESS: 'Thông tin tài khoản thành công',
-  GMAIL_NOT_VERIFIED: 'Email chưa được xác thực'
+  GMAIL_NOT_VERIFIED: 'Email chưa được xác thực',
+  EMAIL_NOT_FOUND: 'Email không tồn tại'
 } as const
 
 export const USERS_MESSAGES = {
   CREATE_SUCCESS: 'Tạo người dùng thành công',
-  UPDATE_PROFILE_SUCCESS: 'Cập nhật thông tin thành công'
+  UPDATE_PROFILE_SUCCESS: 'Cập nhật thông tin thành công',
+  DELETE_SUCCESS: 'Xóa người dùng thành công',
+  YOU_NOT_HAVE_PERMISSION: 'Bạn không có quyền thực hiện hành động này'
 } as const
 
 export const ROLES_MESSAGES = {
@@ -82,3 +91,23 @@ export const ADDRESSES_MESSAGES = {
   ADDRESS_NOT_FOUND: 'Địa chỉ không tồn tại',
   ADDRESS_IS_REQUIRED: 'Địa chỉ không để trống'
 } as const
+
+export const CATEGORIES_MESSAGES = {
+  CREATE_SUCCESS: 'Tạo danh mục thành công',
+  UPDATE_SUCCESS: 'Cập nhật danh mục thành công',
+  DELETE_SUCCESS: 'Xóa danh mục thành công',
+  CATEGORIES_NOT_FOUND: 'Danh mục không tồn tại',
+  NAME_IS_REQUIRED: 'Tên danh mục không để trống',
+  NAME_MUST_BE_A_STRING: 'Tên danh mục phải là một chuỗi',
+  DESCRIPTION_IS_REQUIRED: 'Mô tả không để trống',
+  DESCRIPTION_MUST_BE_A_STRING: 'Mô tả phải là một chuỗi',
+  SLUG_IS_REQUIRED: 'Slug không để trống',
+  SLUG_MUST_BE_A_STRING: 'Slug phải là một chuỗi'
+} as const
+
+export const PRODUCTS_MESSAGES = {
+  CREATE_SUCCESS: 'Tạo sản phẩm thành công',
+  UPDATE_SUCCESS: 'Cập nhật sản phẩm thành công',
+  DELETE_SUCCESS: 'Xóa sản phẩm thành công',
+  PRODUCT_NOT_FOUND: 'Sản phẩm không tồn tại'
+}

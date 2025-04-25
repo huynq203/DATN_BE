@@ -1,4 +1,4 @@
-import { TokenType, UserVerifyStatus } from '~/constants/enums'
+import { RoleType, TokenType, UserVerifyStatus } from '~/constants/enums'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { signToken, verifyToken } from '~/utils/jwt'
 import databaseService from './database.services'
@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb'
 import { hashPassword } from '~/utils/crypto'
 import User from '~/models/schemas/User.schemas'
 import { CreateUserReqBody } from '~/models/requests/User.requests'
+import { USERS_MESSAGES } from '~/constants/messages'
 
 class UsersService {
   //Khoi tao accesstoken
@@ -94,21 +95,31 @@ class UsersService {
   }
 
   //Tạo tài khoản user
-  async createUser(payload: CreateUserReqBody) {
-    const user_id = new ObjectId()
-    const user = await databaseService.users.insertOne(
-      new User({
-        ...payload,
-        password: hashPassword(payload.password),
-        role: new ObjectId(payload.role),
-        created_by: user_id
-      })
-    )
-    const result = await databaseService.users.findOne({ _id: user.insertedId })
-    return result
+  async createUser({ payload, role_id }: { payload: CreateUserReqBody; role_id: string }) {
+    const user_role = await databaseService.roles.findOne({ _id: new ObjectId(role_id) })
+    console.log(user_role)
+    if (user_role?.role_name === RoleType.Admin) {
+      const user_id = new ObjectId()
+      const user = await databaseService.users.insertOne(
+        new User({
+          ...payload,
+          password: hashPassword(payload.password),
+          role: new ObjectId(payload.role),
+          created_by: user_id
+        })
+      )
+      const result = await databaseService.users.findOne({ _id: user.insertedId })
+      return {
+        message: USERS_MESSAGES.CREATE_SUCCESS,
+        result
+      }
+    } else {
+      return {
+        message: USERS_MESSAGES.YOU_NOT_HAVE_PERMISSION
+      }
+    }
   }
 
-  
 }
 
 const usersService = new UsersService()

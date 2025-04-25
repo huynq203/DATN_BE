@@ -26,7 +26,7 @@ export const nameSchema: ParamSchema = {
     errorMessage: COMMONS_MESSAGES.NAME_LENGTH_MUST_BE_FROM_1_TO_50
   }
 }
-export const PasswordSchema: ParamSchema = {
+export const passwordSchema: ParamSchema = {
   notEmpty: {
     errorMessage: COMMONS_MESSAGES.PASSWORD_IS_REQUIRED
   },
