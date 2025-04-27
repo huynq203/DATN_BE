@@ -1,9 +1,29 @@
 import { Router } from 'express'
-import { createCategoryController } from '~/controllers/categories.controllers'
-import { createCategoryValidator } from '~/middlewares/categories.middlewares'
+import {
+  createCategoryController,
+  deleteCategoryController,
+  getAllCategoriesController,
+  getCategoryByIdController,
+  updateCategoryController
+} from '~/controllers/categories.controllers'
+import { createCategoryValidator, updateCategoryValidator } from '~/middlewares/categories.middlewares'
 import { accessTokenValidator } from '~/middlewares/commons.middlewares'
 import { wrapRequestHandler } from '~/utils/hanlders'
 const categoriesRouter = Router()
+
+/**
+ * Description: GET Category
+ * Path: api/categories/
+ * Method: GET
+ */
+categoriesRouter.get('/', wrapRequestHandler(getAllCategoriesController))
+
+/**
+ * Description: GET Category By ID
+ * Path: api/categories/:category_id
+ * Method: GET
+ */
+categoriesRouter.get('/:category_id', wrapRequestHandler(getCategoryByIdController))
 
 /**
  * Description: Create Category
@@ -26,11 +46,20 @@ categoriesRouter.post(
  * Body: {name:string,description:string}
  * Header: {Authorization: Bearer <access_token>}
  */
-categoriesRouter.put(
-  '/update',
+categoriesRouter.patch(
+  '/update/:product_id',
   accessTokenValidator,
-  createCategoryValidator,
-  wrapRequestHandler(createCategoryController)
+  updateCategoryValidator,
+  wrapRequestHandler(updateCategoryController)
 )
+
+/**
+ * Description: Delete Category
+ * Path: api/categories/delete
+ * Method: DELETE
+ * Body: {_id:string,name:string,description:string,created_by}
+ * Header: {Authorization: Bearer <access_token>}
+ */
+categoriesRouter.delete('/delete/:product_id', accessTokenValidator, wrapRequestHandler(deleteCategoryController))
 
 export default categoriesRouter

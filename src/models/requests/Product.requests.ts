@@ -1,12 +1,16 @@
 import { ObjectId } from 'mongodb'
 import { ProductStatus } from '~/constants/enums'
+import { Media } from '../Other'
 
 export interface ProductReqBody {
   category_id: string
   name: string
   description: string
-  detail: string // Chi tiết sản phẩm
-  url_images?: string[]
   price: number
-  created_by: ObjectId
+}
+
+export interface UpdateProductReqBody {
+  name?: string
+  description?: string
+  price?: number
 }

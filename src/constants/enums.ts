@@ -21,6 +21,6 @@ export enum RoleType {
   Staff = 'staff'
 }
 export enum MediaType {
-  Image,
-  Video
+  Image, // 0
+  Video // 1
 }

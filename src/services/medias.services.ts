@@ -2,19 +2,19 @@ import { Request } from 'express'
 import path from 'path'
 import sharp from 'sharp'
 import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
-import { MediaType } from '~/constants/enums'
-import { getNameFromFullname, handleUploadImage } from '~/utils/file'
+
+import { getNameFromFullname, handleUploadImage, handleUploadVideo } from '~/utils/file'
 import { uploadFiletos3 } from '~/utils/s3'
 import mime from 'mime'
 import fsPromises from 'fs/promises'
-interface Media {
-  url: string
-  type: MediaType
-}
+import { MediaType } from '~/constants/enums'
+import { Media } from '~/models/Other'
+
 class MediasSerive {
-  async uploadImage(req: Request) {
+  async uploadImage(req: Request, folder: string) {
     //file tu uploads/tmp
     const files = await handleUploadImage(req)
+
     // return files
     //dùng Promise để hình ảnh cùng thực hiện chứ k phải đợi từng cái thực hiện
     const result: Media[] = await Promise.all(
@@ -24,7 +24,7 @@ class MediasSerive {
         const newPath = path.resolve(UPLOAD_IMAGE_DIR, newFullFilename)
         await sharp(file.filepath).jpeg().toFile(newPath)
         const resultS3 = await uploadFiletos3({
-          filename: 'images/' + newFullFilename,
+          filename: folder + '/' + newFullFilename,
           filepath: newPath,
           contentType: mime.getType(newPath) as string
         })
@@ -32,6 +32,27 @@ class MediasSerive {
         return {
           url: resultS3.Location as string,
           type: MediaType.Image
+        }
+      })
+    )
+    return result
+  }
+  async uploadVideo(req: Request, folder: string) {
+    //file tu uploads/tmp
+    const files = await handleUploadVideo(req)
+
+    const result: Media[] = await Promise.all(
+      files.map(async (file) => {
+        //dùng Promise để hình ảnh cùng thực hiện chứ k phải đợi từng cái thực hiện
+        const resultS3 = await uploadFiletos3({
+          filename: folder + '/' + file.newFilename,
+          filepath: file.filepath,
+          contentType: mime.getType(file.filepath) as string
+        })
+        fsPromises.unlink(file.filepath) // Sau khi upload anh thi se xoa anh /uploads/tmp
+        return {
+          url: resultS3.Location as string,
+          type: MediaType.Video
         }
       })
     )

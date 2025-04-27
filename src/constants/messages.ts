@@ -93,6 +93,8 @@ export const ADDRESSES_MESSAGES = {
 } as const
 
 export const CATEGORIES_MESSAGES = {
+  GET_CATEGORY_SUCCESS: 'Lấy danh mục thành công',
+  GET_CATEGORY_BY_ID_SUCCESS: 'Lấy danh mục theo id thành công',
   CREATE_SUCCESS: 'Tạo danh mục thành công',
   UPDATE_SUCCESS: 'Cập nhật danh mục thành công',
   DELETE_SUCCESS: 'Xóa danh mục thành công',
@@ -106,8 +108,13 @@ export const CATEGORIES_MESSAGES = {
 } as const
 
 export const PRODUCTS_MESSAGES = {
-  CREATE_SUCCESS: 'Tạo sản phẩm thành công',
+  CREATE_PRODUCT_SUCCESS: 'Tạo sản phẩm thành công',
   UPDATE_SUCCESS: 'Cập nhật sản phẩm thành công',
   DELETE_SUCCESS: 'Xóa sản phẩm thành công',
-  PRODUCT_NOT_FOUND: 'Sản phẩm không tồn tại'
+  PRODUCT_NOT_FOUND: 'Sản phẩm không tồn tại',
+  GET_PRODUCT_SUCCESS: 'Lấy sản phẩm thành công'
 }
+
+export const MEDIA_MESSAGES = {
+  UPLOAD_SUCCESS: 'Upload file success'
+} as const

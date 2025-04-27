@@ -1,16 +1,16 @@
 import { ObjectId } from 'mongodb'
 import { ProductStatus } from '~/constants/enums'
+import { Media } from '../Other'
 interface ProductType {
   _id?: ObjectId
   category_id: ObjectId // Danh mục
   name: string // Tên sản phẩm
   slug: string // Tên sản phẩm dạng slug (đã được chuyển đổi từ tên sản phẩm)
   description: string // Mô tả sản phẩm
-  detail: string // Chi tiết sản phẩm
-  url_images?: string[]
+  url_images?: Media[]
   price: number // Giá sản phẩm
   promotion_price?: number // Giá khuyến mãi
-  status: ProductStatus // Trạng thái sản phẩm (0: không hoạt động, 1: hoạt động)
+  status?: ProductStatus // Trạng thái sản phẩm (0: không hoạt động, 1: hoạt động)
   created_by: ObjectId // Người tạo sản phẩm
   created_at?: Date
   updated_at?: Date
@@ -21,12 +21,11 @@ export default class Product {
   category_id: ObjectId // Danh mục
   name: string // Tên sản phẩm
   description: string // Mô tả sản phẩm
-  detail: string // Chi tiết sản phẩm
   slug: string // Tên sản phẩm dạng slug (đã được chuyển đổi từ tên sản phẩm)
-  url_images?: string[]
+  url_images?: Media[]
   price: number // Giá sản phẩm
   promotion_price?: number // Giá khuyến mãi
-  status: ProductStatus // Trạng thái sản phẩm (0: không hoạt động, 1: hoạt động)
+  status: ProductStatus // Trạng thái sản phẩm (0: không hiển thị, 1: hiển thị)
   created_by: ObjectId // Người tạo sản phẩm
   created_at?: Date
   updated_at?: Date
@@ -36,11 +35,10 @@ export default class Product {
     this.name = product.name
     this.slug = product.slug
     this.description = product.description
-    this.detail = product.detail
     this.url_images = product.url_images || []
     this.price = product.price
     this.promotion_price = product.promotion_price || 0
-    this.status = product.status || ProductStatus.Inactive
+    this.status = product.status || ProductStatus.Active
     this.created_by = product.created_by
     this.created_at = product.created_at || new Date()
     this.updated_at = product.updated_at || new Date()

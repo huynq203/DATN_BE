@@ -6,3 +6,10 @@ export interface CategoryReqBody {
   slug?: string
   created_by: ObjectId
 }
+
+export interface UpdateCategoryReqBody {
+  name?: string
+  description?: string
+  slug?: string
+  created_by: ObjectId
+}
