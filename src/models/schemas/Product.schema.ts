@@ -11,6 +11,7 @@ interface ProductType {
   price: number // Giá sản phẩm
   promotion_price?: number // Giá khuyến mãi
   status?: ProductStatus // Trạng thái sản phẩm (0: không hoạt động, 1: hoạt động)
+  guest_view?: number
   created_by: ObjectId // Người tạo sản phẩm
   created_at?: Date
   updated_at?: Date
@@ -26,6 +27,7 @@ export default class Product {
   price: number // Giá sản phẩm
   promotion_price?: number // Giá khuyến mãi
   status: ProductStatus // Trạng thái sản phẩm (0: không hiển thị, 1: hiển thị)
+  guest_view: number // Số lượt xem của khách hàng
   created_by: ObjectId // Người tạo sản phẩm
   created_at?: Date
   updated_at?: Date
@@ -39,6 +41,7 @@ export default class Product {
     this.price = product.price
     this.promotion_price = product.promotion_price || 0
     this.status = product.status || ProductStatus.Active
+    this.guest_view = product.guest_view || 0
     this.created_by = product.created_by
     this.created_at = product.created_at || new Date()
     this.updated_at = product.updated_at || new Date()

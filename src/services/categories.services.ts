@@ -47,8 +47,6 @@ class CategoriesSerice {
     product_id: string
     payload: UpdateCategoryReqBody
   }) {
-    console.log(user_id, payload)
-
     const _payload = payload.description ? { ...payload, slug: slug(payload.description) } : payload
     const category = await databaseService.categories.findOneAndUpdate(
       {

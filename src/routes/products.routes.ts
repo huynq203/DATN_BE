@@ -8,6 +8,7 @@ import {
   uploadImageProductController
 } from '~/controllers/products.controllers'
 import { accessTokenValidator, isLoggedInVaidator } from '~/middlewares/commons.middlewares'
+import { createProductValidator, updateProductValidator } from '~/middlewares/products.middlewares'
 import { wrapRequestHandler } from '~/utils/hanlders'
 const productsRouter = Router()
 
@@ -37,13 +38,23 @@ productsRouter.get(
  * Body: {category_id,name:string,description:string,image_url?:string,price:number,created_by:string}
  * Header: {Authorization: Bearer <access_token>}
  */
-productsRouter.post('/create', accessTokenValidator, wrapRequestHandler(createProductController))
+productsRouter.post(
+  '/create',
+  accessTokenValidator,
+  createProductValidator,
+  wrapRequestHandler(createProductController)
+)
 
 //Update Product
-productsRouter.patch('/update', accessTokenValidator, wrapRequestHandler(updateProductController))
+productsRouter.patch(
+  '/update/:product_id',
+  accessTokenValidator,
+  updateProductValidator,
+  wrapRequestHandler(updateProductController)
+)
 
 //Delete Product
-productsRouter.delete('/delete', accessTokenValidator, wrapRequestHandler(deleteProductController))
+productsRouter.delete('/delete/product_id', accessTokenValidator, wrapRequestHandler(deleteProductController))
 
 //Upload file
 productsRouter.post('/upload-image/:product_id', accessTokenValidator, wrapRequestHandler(uploadImageProductController))

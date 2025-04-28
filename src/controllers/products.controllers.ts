@@ -25,9 +25,6 @@ export const createProductController = async (
   next: NextFunction
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  console.log(user_id)
-  console.log(req.body)
-
   const result = await productsService.createProducts({
     user_id,
     payload: req.body
@@ -45,19 +42,26 @@ export const updateProductController = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log(req)
-
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { product_id } = req.params
+  console.log(req.body)
+  const result = await productsService.updateProducts({
+    user_id,
+    product_id,
+    payload: req.body
+  })
   res.json({
-    message: MEDIA_MESSAGES.UPLOAD_SUCCESS
+    message: PRODUCTS_MESSAGES.UPDATE_SUCCESS,
+    result
   })
   return
 }
 
 export const deleteProductController = async (req: Request, res: Response, next: NextFunction) => {
-  console.log(req)
-
+  const { product_id } = req.params
+  await productsService.deleteProducts(product_id)
   res.json({
-    message: MEDIA_MESSAGES.UPLOAD_SUCCESS
+    message: PRODUCTS_MESSAGES.DELETE_SUCCESS
   })
   return
 }

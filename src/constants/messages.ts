@@ -108,6 +108,13 @@ export const CATEGORIES_MESSAGES = {
 } as const
 
 export const PRODUCTS_MESSAGES = {
+  CATEGORY_ID_REQUIRED: 'Danh mục không để trống',
+  NAME_REQUIRED: 'Tên sản phẩm không để trống',
+  DESCRIPTION_REQUIRED: 'Mô tả không để trống',
+  PRICE_REQUIRED: 'Giá không để trống',
+  PRICE_MUST_BE_A_NUMBER: 'Giá phải là một số',
+  PRICE_MUST_BE_A_POSITIVE_NUMBER: 'Giá phải là một số dương',
+
   CREATE_PRODUCT_SUCCESS: 'Tạo sản phẩm thành công',
   UPDATE_SUCCESS: 'Cập nhật sản phẩm thành công',
   DELETE_SUCCESS: 'Xóa sản phẩm thành công',
