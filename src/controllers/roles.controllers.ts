@@ -6,6 +6,9 @@ import roleService from '~/services/roles.services'
 import dotenv from 'dotenv'
 dotenv.config()
 
+export const getAllRoleController = async (req: Request, res: Response, next: NextFunction) => {}
+export const getRolebyIdController = async (req: Request, res: Response, next: NextFunction) => {}
+
 export const createRoleController = async (
   req: Request<ParamsDictionary, any, RoleReqBody>,
   res: Response,

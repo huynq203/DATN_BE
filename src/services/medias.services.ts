@@ -9,12 +9,11 @@ import mime from 'mime'
 import fsPromises from 'fs/promises'
 import { MediaType } from '~/constants/enums'
 import { Media } from '~/models/Other'
-
+import fsextra from 'fs-extra'
 class MediasSerive {
   async uploadImage(req: Request, folder: string) {
     //file tu uploads/tmp
     const files = await handleUploadImage(req)
-
     // return files
     //dùng Promise để hình ảnh cùng thực hiện chứ k phải đợi từng cái thực hiện
     const result: Media[] = await Promise.all(
@@ -22,13 +21,19 @@ class MediasSerive {
         const newName = getNameFromFullname(file.newFilename)
         const newFullFilename = `${newName}.jpg`
         const newPath = path.resolve(UPLOAD_IMAGE_DIR, newFullFilename)
-        await sharp(file.filepath).jpeg().toFile(newPath)
+        try {
+          await sharp(file.filepath).jpeg().toFile(newPath)
+        } catch (err) {
+          console.error('Sharp processing failed:', err)
+        }
         const resultS3 = await uploadFiletos3({
           filename: folder + '/' + newFullFilename,
           filepath: newPath,
           contentType: mime.getType(newPath) as string
         })
-        await Promise.all([fsPromises.unlink(file.filepath), fsPromises.unlink(newPath)]) // Sau khi upload anh thi se xoa anh /uploads/tmp
+
+        await Promise.all([fsPromises.unlink(file.filepath), fsPromises.unlink(newPath)])
+        // Sau khi upload anh thi se xoa anh /uploads/tmp
         return {
           url: resultS3.Location as string,
           type: MediaType.Image

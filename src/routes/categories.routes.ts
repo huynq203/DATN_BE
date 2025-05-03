@@ -47,7 +47,7 @@ categoriesRouter.post(
  * Header: {Authorization: Bearer <access_token>}
  */
 categoriesRouter.patch(
-  '/update/:product_id',
+  '/edit/:product_id',
   accessTokenValidator,
   updateCategoryValidator,
   wrapRequestHandler(updateCategoryController)

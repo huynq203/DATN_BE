@@ -114,7 +114,7 @@ export const PRODUCTS_MESSAGES = {
   PRICE_REQUIRED: 'Giá không để trống',
   PRICE_MUST_BE_A_NUMBER: 'Giá phải là một số',
   PRICE_MUST_BE_A_POSITIVE_NUMBER: 'Giá phải là một số dương',
-
+  SIZES_REQUIRED: 'Kích thước không để trống',
   CREATE_PRODUCT_SUCCESS: 'Tạo sản phẩm thành công',
   UPDATE_SUCCESS: 'Cập nhật sản phẩm thành công',
   DELETE_SUCCESS: 'Xóa sản phẩm thành công',
@@ -124,4 +124,16 @@ export const PRODUCTS_MESSAGES = {
 
 export const MEDIA_MESSAGES = {
   UPLOAD_SUCCESS: 'Upload file success'
+} as const
+
+export const RATINGS_MESSAGES = {
+  CREATE_SUCCESS: 'Tạo đánh giá thành công',
+  UPDATE_SUCCESS: 'Cập nhật đánh giá thành công',
+  DELETE_SUCCESS: 'Xóa đánh giá thành công',
+  RATING_NOT_FOUND: 'Đánh giá không tồn tại',
+  STAR_REQUIRED: 'Số sao không để trống',
+  STAR_MUST_BE_A_NUMBER: 'Số sao phải là một số',
+  STAR_MUST_BE_A_POSITIVE_NUMBER: 'Số sao phải là một số dương',
+  COMMENT_REQUIRED: 'Bình luận không để trống',
+  COMMENT_MUST_BE_A_STRING: 'Bình luận phải là một chuỗi'
 } as const

@@ -10,8 +10,10 @@ interface ProductType {
   url_images?: Media[]
   price: number // Giá sản phẩm
   promotion_price?: number // Giá khuyến mãi
+  sizes: ObjectId[] // Kích thước sản phẩm
   status?: ProductStatus // Trạng thái sản phẩm (0: không hoạt động, 1: hoạt động)
-  guest_view?: number
+  view?: number
+  sold?: number // Số lượng đã bán của sản phẩm
   created_by: ObjectId // Người tạo sản phẩm
   created_at?: Date
   updated_at?: Date
@@ -26,8 +28,10 @@ export default class Product {
   url_images?: Media[]
   price: number // Giá sản phẩm
   promotion_price?: number // Giá khuyến mãi
+  sizes: ObjectId[] // Kích thước sản phẩm
   status: ProductStatus // Trạng thái sản phẩm (0: không hiển thị, 1: hiển thị)
-  guest_view: number // Số lượt xem của khách hàng
+  view: number // Số lượt xem của khách hàng
+  sold: number // Số lượng đã bán của sản phẩm
   created_by: ObjectId // Người tạo sản phẩm
   created_at?: Date
   updated_at?: Date
@@ -40,8 +44,10 @@ export default class Product {
     this.url_images = product.url_images || []
     this.price = product.price
     this.promotion_price = product.promotion_price || 0
+    this.sizes = product.sizes
     this.status = product.status || ProductStatus.Active
-    this.guest_view = product.guest_view || 0
+    this.view = product.view || 0
+    this.sold = product.sold || 0
     this.created_by = product.created_by
     this.created_at = product.created_at || new Date()
     this.updated_at = product.updated_at || new Date()

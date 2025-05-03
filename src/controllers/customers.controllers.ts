@@ -20,7 +20,11 @@ import customersService from '~/services/customers.services'
 import { COMMONS_MESSAGES, CUSTOMERS_MESSAGES } from '~/constants/messages'
 import Customer from '~/models/schemas/Customer.schemas'
 import dotenv from 'dotenv'
+import { access } from 'fs'
 dotenv.config()
+
+export const getAllCustomersController = async (req: Request, res: Response, next: NextFunction) => {}
+export const deleteCustomerController = async (req: Request, res: Response, next: NextFunction) => {}
 
 export const registerController = async (
   req: Request<ParamsDictionary, any, RegisterReqBody>,
@@ -44,9 +48,14 @@ export const loginController = async (
   const customer_id = customer._id as ObjectId
   const verify = customer.verify as UserVerifyStatus
   const result = await customersService.login({ customer_id: customer_id.toString(), verify })
+  res.cookie('refresh_token', result.refresh_token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
   res.json({
     message: COMMONS_MESSAGES.LOGIN_SUCCESS,
-    result
+    result: {
+      access_token: result.access_token,
+      expires: result.expires,
+      customer: result.customer
+    }
   })
   return
 }

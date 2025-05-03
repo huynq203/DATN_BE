@@ -18,9 +18,9 @@ export const getAllCategoriesController = async (req: Request, res: Response, ne
       categories: data.categories,
       pagination: {
         page,
-        limit
-      },
-      totalPages: Math.ceil(data.total / limit)
+        limit,
+        total_page: Math.ceil(data.total / limit)
+      }
     }
   })
   return

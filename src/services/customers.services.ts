@@ -230,7 +230,7 @@ class CustomersService {
     // 3. Client send request to server with email_verify_token
     // 4. Server verify email_verify_token
     // 5. Client receive access_token and refresh_token
-    await sendVerifyRegisterEmail(payload.email, email_verify_token)
+    // await sendVerifyRegisterEmail(payload.email, email_verify_token)
 
     return {
       access_token,

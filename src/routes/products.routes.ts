@@ -25,11 +25,7 @@ productsRouter.get('/', wrapRequestHandler(getAllProductController))
  * Method: GET
  * Body: {product_id:string}
  */
-productsRouter.get(
-  '/:product_id',
-  isLoggedInVaidator(accessTokenValidator),
-  wrapRequestHandler(getProductByIdController)
-)
+productsRouter.get('/:product_id', wrapRequestHandler(getProductByIdController))
 
 /**
  * Description: Create Product
@@ -47,7 +43,7 @@ productsRouter.post(
 
 //Update Product
 productsRouter.patch(
-  '/update/:product_id',
+  '/edit/:product_id',
   accessTokenValidator,
   updateProductValidator,
   wrapRequestHandler(updateProductController)

@@ -3,7 +3,6 @@ import { deleteAddressController } from '~/controllers/addresses.controllers'
 import { createRoleController, updateRoleController } from '~/controllers/roles.controllers'
 import { accessTokenValidator } from '~/middlewares/commons.middlewares'
 import { createRoleValidator } from '~/middlewares/roles.middlewares'
-
 import { wrapRequestHandler } from '~/utils/hanlders'
 const rolesRouter = Router()
 

@@ -2,7 +2,9 @@ import { Router } from 'express'
 const customersRouter = Router()
 import {
   changePasswordController,
+  deleteCustomerController,
   forgotPasswordController,
+  getAllCustomersController,
   getMeController,
   loginController,
   logoutController,
@@ -76,7 +78,6 @@ customersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeControl
  * Method: PATCH
  * Header: {Authorization: Bearer <access_token>}
  * Body: CustomerSchema
- * Headers: {Authorization: Bearer <access_token>}
  */
 customersRouter.patch('/me', accessTokenValidator, verifiedCustomerValidator, wrapRequestHandler(updatetMeController))
 
@@ -144,5 +145,26 @@ customersRouter.put(
   changePasswordValidator,
   wrapRequestHandler(changePasswordController)
 )
+
+/**
+ * Description: Get all Customer
+ * Path: api/customers/
+ * Method: GET
+ */
+customersRouter.get('/', wrapRequestHandler(getAllCustomersController))
+
+/**
+ * Description: Get Customer by Id
+ * Path: api/customers/:customer_id
+ * Method: GET
+ */
+customersRouter.get('/:customer_id', wrapRequestHandler(getAllCustomersController))
+
+/**
+ * Description: Get Customer by Id
+ * Path: api/customers/:customer_id
+ * Method: PUT
+ */
+customersRouter.delete('/delete/:customer_id', wrapRequestHandler(deleteCustomerController))
 
 export default customersRouter

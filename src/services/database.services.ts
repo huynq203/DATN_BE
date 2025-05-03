@@ -7,6 +7,7 @@ import Role from '~/models/schemas/Roles.schemas'
 import Address from '~/models/schemas/Addresses.schemas'
 import Category from '~/models/schemas/Category.schema'
 import Product from '~/models/schemas/Product.schema'
+import Rating from '~/models/schemas/Ratings.schemas'
 dotenv.config()
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@datn.phpnw.mongodb.net/?retryWrites=true&w=majority&appName=DATN`
 class DatabaseService {
@@ -45,6 +46,12 @@ class DatabaseService {
   }
   get products(): Collection<Product> {
     return this.db.collection(process.env.DB_PRODUCTS_COLLECTION as string)
+  }
+  get ratings(): Collection<Rating> {
+    return this.db.collection(process.env.DB_RATINGS_COLLECTION as string)
+  }
+  get sizes(): Collection<Rating> {
+    return this.db.collection(process.env.DB_SIZES_COLLECTION as string)
   }
 }
 
