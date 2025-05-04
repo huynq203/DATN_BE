@@ -53,6 +53,7 @@ export const loginController = async (
     message: COMMONS_MESSAGES.LOGIN_SUCCESS,
     result: {
       access_token: result.access_token,
+      refresh_token: result.refresh_token,
       expires: result.expires,
       customer: result.customer
     }

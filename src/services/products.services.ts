@@ -11,16 +11,62 @@ class ProductsSerice {
     limit,
     page,
     sort_by,
-    order
+    order,
+    category_id,
+    price_min,
+    price_max,
+    name
   }: {
     limit: number
     page: number
     sort_by: string
     order: number
+    category_id: string
+    price_min: number
+    price_max: number
+    name: string
   }) {
+    const category = category_id
+      ? {
+          $match: {
+            category_id: new ObjectId(category_id)
+          }
+        }
+      : null
+    const filterPrice =
+      price_min || price_max
+        ? {
+            $match: {
+              price: { $gte: price_min, $lte: price_max }
+            }
+          }
+        : null
+    const promotion_price =
+      sort_by === 'promotion_price'
+        ? {
+            $match: {
+              promotion_price: { $gt: 0 }
+            }
+          }
+        : null
+
+    const filterName = name
+      ? {
+          $match: {
+            name: {
+              $regex: name,
+              $options: 'i'
+            }
+          }
+        }
+      : null
     const [products, total] = await Promise.all([
       databaseService.products
         .aggregate([
+          ...(category ? [category] : []),
+          ...(filterPrice ? [filterPrice] : []),
+          ...(promotion_price ? [promotion_price] : []),
+          ...(filterName ? [filterName] : []),
           {
             $lookup: {
               from: 'categories',
@@ -44,12 +90,6 @@ class ProductsSerice {
             }
           },
           {
-            $unwind: {
-              path: '$sizes',
-              preserveNullAndEmptyArrays: true
-            }
-          },
-          {
             $project: {
               _id: 1,
               'category_id._id': 1,
@@ -62,10 +102,10 @@ class ProductsSerice {
               promotion_price: 1,
               'sizes._id': 1,
               'sizes.size_name': 1,
-              'sizes.stock': 1,
               status: 1,
               view: 1,
               sold: 1,
+              stock: 1,
               created_by: 1,
               created_at: 1,
               updated_at: 1
@@ -108,12 +148,7 @@ class ProductsSerice {
               as: 'sizes'
             }
           },
-          {
-            $unwind: {
-              path: '$sizes',
-              preserveNullAndEmptyArrays: true
-            }
-          },
+
           {
             $project: {
               _id: 1,
@@ -127,10 +162,10 @@ class ProductsSerice {
               promotion_price: 1,
               'sizes._id': 1,
               'sizes.size_name': 1,
-              'sizes.stock': 1,
               status: 1,
               view: 1,
-              sold: 1
+              sold: 1,
+              stock: 1
             }
           },
           {
@@ -187,12 +222,6 @@ class ProductsSerice {
           }
         },
         {
-          $unwind: {
-            path: '$sizes',
-            preserveNullAndEmptyArrays: true
-          }
-        },
-        {
           $project: {
             _id: 1,
             'category_id._id': 1,
@@ -205,13 +234,14 @@ class ProductsSerice {
             promotion_price: 1,
             'sizes._id': 1,
             'sizes.size_name': 1,
-            'sizes.stock': 1,
             status: 1,
-            view: 1
+            view: 1,
+            sold: 1,
+            stock: 1
           }
         }
       ])
-      .toArray()
+      .next()
     return product
   }
 

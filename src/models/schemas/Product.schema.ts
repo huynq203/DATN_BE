@@ -14,6 +14,7 @@ interface ProductType {
   status?: ProductStatus // Trạng thái sản phẩm (0: không hoạt động, 1: hoạt động)
   view?: number
   sold?: number // Số lượng đã bán của sản phẩm
+  stock?: number // Số lượng hàng tồn kho
   created_by: ObjectId // Người tạo sản phẩm
   created_at?: Date
   updated_at?: Date
@@ -32,6 +33,7 @@ export default class Product {
   status: ProductStatus // Trạng thái sản phẩm (0: không hiển thị, 1: hiển thị)
   view: number // Số lượt xem của khách hàng
   sold: number // Số lượng đã bán của sản phẩm
+  stock: number // Số lượng hàng tồn kho
   created_by: ObjectId // Người tạo sản phẩm
   created_at?: Date
   updated_at?: Date
@@ -48,6 +50,7 @@ export default class Product {
     this.status = product.status || ProductStatus.Active
     this.view = product.view || 0
     this.sold = product.sold || 0
+    this.stock = product.stock || 0
     this.created_by = product.created_by
     this.created_at = product.created_at || new Date()
     this.updated_at = product.updated_at || new Date()
