@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb'
 import { RoleReqBody } from '~/models/requests/Role.requests'
-import Role from '~/models/schemas/Roles.schemas'
+import Role from '~/models/schemas/Role.schemas'
 import databaseService from './database.services'
 
 class RolesService {

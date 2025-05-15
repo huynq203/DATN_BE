@@ -97,7 +97,7 @@ class UsersService {
   //Tạo tài khoản user
   async createUser({ payload, role_id }: { payload: CreateUserReqBody; role_id: string }) {
     const user_role = await databaseService.roles.findOne({ _id: new ObjectId(role_id) })
-    console.log(user_role)
+
     if (user_role?.role_name === RoleType.Admin) {
       const user_id = new ObjectId()
       const user = await databaseService.users.insertOne(

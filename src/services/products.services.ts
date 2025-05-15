@@ -84,9 +84,17 @@ class ProductsSerice {
           {
             $lookup: {
               from: 'sizes',
-              localField: 'sizes',
-              foreignField: '_id',
+              localField: '_id',
+              foreignField: 'product_id',
               as: 'sizes'
+            }
+          },
+          {
+            $lookup: {
+              from: 'colors',
+              localField: '_id',
+              foreignField: 'product_id',
+              as: 'colors'
             }
           },
           {
@@ -102,6 +110,8 @@ class ProductsSerice {
               promotion_price: 1,
               'sizes._id': 1,
               'sizes.size_name': 1,
+              'colors._id': 1,
+              'colors.color_name': 1,
               status: 1,
               view: 1,
               sold: 1,
@@ -143,9 +153,17 @@ class ProductsSerice {
           {
             $lookup: {
               from: 'sizes',
-              localField: 'sizes',
-              foreignField: '_id',
+              localField: '_id',
+              foreignField: 'product_id',
               as: 'sizes'
+            }
+          },
+          {
+            $lookup: {
+              from: 'colors',
+              localField: '_id',
+              foreignField: 'product_id',
+              as: 'colors'
             }
           },
 
@@ -162,6 +180,8 @@ class ProductsSerice {
               promotion_price: 1,
               'sizes._id': 1,
               'sizes.size_name': 1,
+              'colors._id': 1,
+              'colors.color_name': 1,
               status: 1,
               view: 1,
               sold: 1,
@@ -216,9 +236,17 @@ class ProductsSerice {
         {
           $lookup: {
             from: 'sizes',
-            localField: 'sizes',
-            foreignField: '_id',
+            localField: '_id',
+            foreignField: 'product_id',
             as: 'sizes'
+          }
+        },
+        {
+          $lookup: {
+            from: 'colors',
+            localField: '_id',
+            foreignField: 'product_id',
+            as: 'colors'
           }
         },
         {
@@ -234,6 +262,8 @@ class ProductsSerice {
             promotion_price: 1,
             'sizes._id': 1,
             'sizes.size_name': 1,
+            'colors._id': 1,
+            'colors.color_name': 1,
             status: 1,
             view: 1,
             sold: 1,
@@ -323,8 +353,6 @@ class ProductsSerice {
     )
     return result
   }
-
-  async searchProduct() {}
 }
 const productsService = new ProductsSerice()
 export default productsService

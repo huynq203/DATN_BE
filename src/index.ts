@@ -12,6 +12,8 @@ import categoriesRouter from './routes/categories.routes'
 import productsRouter from './routes/products.routes'
 import { initFolder } from './utils/file'
 import ratingsRouter from './routes/ratings.routes'
+import ordersRouter from './routes/orders.routes'
+import cartsRouter from './routes/carts.routes'
 
 databaseService.connect()
 const app = express()
@@ -29,6 +31,8 @@ app.use('/api/categories', categoriesRouter)
 app.use('/api/products', productsRouter)
 app.use('/api/ratings', ratingsRouter)
 app.use('/api/products', productsRouter)
+app.use('/api/carts', cartsRouter)
+app.use('/api/orders', ordersRouter)
 
 app.use(defaultErrorHanlder) //default error handle errror.middlleware.ts
 app.listen(port, () => {

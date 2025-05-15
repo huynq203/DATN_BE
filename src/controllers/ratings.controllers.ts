@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { RATINGS_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Customer.requests'
-import { RatingReqBody } from '~/models/requests/Ratings.requests'
+import { RatingReqBody } from '~/models/requests/Ratings.request'
 import ratingsService from '~/services/ratings.services'
 
 export const creatRatingController = async (

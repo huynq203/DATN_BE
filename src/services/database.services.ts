@@ -3,11 +3,15 @@ import dotenv from 'dotenv'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import Customer from '~/models/schemas/Customer.schemas'
 import User from '~/models/schemas/User.schemas'
-import Role from '~/models/schemas/Roles.schemas'
+import Role from '~/models/schemas/Role.schemas'
 import Address from '~/models/schemas/Addresses.schemas'
 import Category from '~/models/schemas/Category.schema'
 import Product from '~/models/schemas/Product.schema'
-import Rating from '~/models/schemas/Ratings.schemas'
+import Rating from '~/models/schemas/Rating.schemas'
+import Size from '~/models/schemas/Size.schemas'
+import Order from '~/models/schemas/Orders.schemas'
+import Cart from '~/models/schemas/Cart.schemas'
+import OrderDetail from '~/models/schemas/OrderDetail.shemas'
 dotenv.config()
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@datn.phpnw.mongodb.net/?retryWrites=true&w=majority&appName=DATN`
 class DatabaseService {
@@ -50,8 +54,17 @@ class DatabaseService {
   get ratings(): Collection<Rating> {
     return this.db.collection(process.env.DB_RATINGS_COLLECTION as string)
   }
-  get sizes(): Collection<Rating> {
+  get sizes(): Collection<Size> {
     return this.db.collection(process.env.DB_SIZES_COLLECTION as string)
+  }
+  get orders(): Collection<Order> {
+    return this.db.collection(process.env.DB_ORDERS_COLLECTION as string)
+  }
+  get order_details(): Collection<OrderDetail> {
+    return this.db.collection(process.env.DB_ORDER_DETAILS_COLLECTION as string)
+  }
+  get carts(): Collection<Cart> {
+    return this.db.collection(process.env.DB_CARTS_COLLECTION as string)
   }
 }
 

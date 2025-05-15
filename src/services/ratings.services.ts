@@ -1,7 +1,7 @@
-import { RatingReqBody } from '~/models/requests/Ratings.requests'
+import { RatingReqBody } from '~/models/requests/Ratings.request'
 import databaseService from './database.services'
 import { ObjectId } from 'mongodb'
-import Rating from '~/models/schemas/Ratings.schemas'
+import Rating from '~/models/schemas/Rating.schemas'
 
 class RatingsService {
   async getRatings() {}

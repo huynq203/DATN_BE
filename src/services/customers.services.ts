@@ -255,21 +255,45 @@ class CustomersService {
         exp: Number(exp)
       })
     )
-    const customer = await databaseService.customers.findOne(
-      { _id: new ObjectId(customer_id) },
-      {
-        projection: {
-          password: 0,
-          email_verify_token: 0,
-          forgot_password_token: 0
+    const customer = await databaseService.customers
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(customer_id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'carts',
+            localField: '_id',
+            foreignField: 'customer_id',
+            as: 'cart'
+          }
+        },
+        {
+          $lookup: {
+            from: 'addresses',
+            localField: '_id',
+            foreignField: 'customer_id',
+            as: 'addresses'
+          }
+        },
+
+        {
+          $project: {
+            name: 1,
+            email: 1,
+            phone: 1,
+            addresses: 1
+          }
         }
-      }
-    )
+      ])
+      .toArray()
     return {
       access_token,
       refresh_token,
       expires: process.env.ACCESS_TOKEN_EXPIRES_IN,
-      customer
+      customer: customer[0]
     }
   }
   //Dang xuat

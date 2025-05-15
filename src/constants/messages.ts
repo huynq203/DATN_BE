@@ -137,3 +137,16 @@ export const RATINGS_MESSAGES = {
   COMMENT_REQUIRED: 'Bình luận không để trống',
   COMMENT_MUST_BE_A_STRING: 'Bình luận phải là một chuỗi'
 } as const
+
+export const CARTS_MESSAGES = {
+  ADD_TO_CART_SUCCESS: 'Thêm vào giỏ hàng thành công',
+  GET_CARTS_SUCCESS: 'Lấy giỏ hàng thành công',
+  UPDATE_CART_SUCCESS: 'Cập nhật giỏ hàng thành công',
+  DELETE_CART_SUCCESS: 'Xóa sản phẩm thành công',
+  BUY_PRODUCT_SUCCESS: 'Mua sản phẩm thành công'
+} as const
+
+export const ORDERS_MESSAGES = {
+  ORDER_PENDING: 'Đang chờ xử lý',
+  ORDER_SUCCESS: 'Đặt hàng thành công'
+}

@@ -24,3 +24,31 @@ export enum MediaType {
   Image, // 0
   Video // 1
 }
+
+export enum OrderStatus {
+  Pending, // Đang chờ xử lý - 1
+  Confirmed, // Đã xác nhận - 2
+  Processing, // Đang xử lý - 3
+  Shipping, // Đang giao hàng - 4
+  Completed, // Đã giao hàng - 5
+  Canceled // Đã hủy - 6
+}
+
+export enum PaymentStatus {
+  Unpaid, // Chưa thanh toán - 0
+  Paid // Đã thanh toán - 1
+}
+
+export enum PaymentMethod {
+  COD, // 0 Thanh toán khi nhận hàng
+  MOMO, // 1 Thanh toán qua thẻ: MOMO
+  VNPAY // 2 Thanh toán qua thẻ: VNPAY
+}
+
+export enum CartStatus {
+  InCart, // Đã thêm vào giỏ hàng - 0
+  Completed, // Đã mua - 1
+  Canceled // Đã hủy - 2
+}
+
+

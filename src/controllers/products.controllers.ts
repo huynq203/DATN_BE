@@ -9,7 +9,6 @@ export const getAllProductController = async (req: Request, res: Response, next:
   const limit = Number(req.query.limit) || 10
   const page = Number(req.query.page) || 1
   const sort_by = (req.query.sort_by as string) || 'created_at'
-
   const order = Number(req.query.order) || -1
   const rating_filter = Number(req.query.rating_filter)
   const price_max = Number(req.query.price_max) || 99999999
@@ -76,7 +75,7 @@ export const updateProductController = async (
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { product_id } = req.params
-  console.log(req.body)
+
   const result = await productsService.updateProducts({
     user_id,
     product_id,

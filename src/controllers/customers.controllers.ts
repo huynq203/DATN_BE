@@ -191,8 +191,6 @@ export const resetPasswordController = async (
 ) => {
   const { customer_id } = req.decoded_password_verify_token as TokenPayload
   const { password } = req.body
-  console.log('customer_id', customer_id)
-
   await customersService.resetPassword(customer_id, password)
   res.json({
     message: CUSTOMERS_MESSAGES.RESET_PASSWORD_SUCCESS
