@@ -6,6 +6,8 @@ import { ObjectId } from 'mongodb'
 import mediasService from './medias.services'
 import { Request } from 'express'
 import { Media } from '~/models/Other'
+import Size from '~/models/schemas/Size.schemas'
+import Color from '~/models/schemas/Color.schemas'
 class ProductsSerice {
   async getAllProducts({
     limit,
@@ -194,6 +196,7 @@ class ProductsSerice {
         ])
         .toArray()
     ])
+
     return {
       products,
       total: total[0]?.total || 0
@@ -277,17 +280,34 @@ class ProductsSerice {
 
   async createProducts({ user_id, payload }: { user_id: string; payload: ProductReqBody }) {
     const generatedSlug = slug(payload.name)
-    const sizes_list = []
-    sizes_list.push(new ObjectId(payload.sizes.toString()))
     const product = await databaseService.products.insertOne(
       new Product({
-        ...payload,
+        name: payload.name,
+        description: payload.description,
+        price: payload.price,
+        stock: payload.stock,
         category_id: new ObjectId(payload.category_id),
         slug: generatedSlug,
-        created_by: new ObjectId(user_id),
-        sizes: sizes_list
+        created_by: new ObjectId(user_id)
       })
     )
+    await databaseService.sizes.insertOne(
+      new Size({
+        product_id: product.insertedId,
+        size_name: Number(payload.size),
+        description: 'Kích thước ' + payload.size,
+        created_by: new ObjectId(user_id)
+      })
+    )
+    await databaseService.colors.insertOne(
+      new Color({
+        product_id: new ObjectId(product.insertedId),
+        color_name: payload.color,
+        description: 'Màu sắc ' + payload.color,
+        created_by: new ObjectId(user_id)
+      })
+    )
+
     const result = await databaseService.products.findOne({
       _id: product.insertedId
     })
@@ -350,6 +370,29 @@ class ProductsSerice {
       {
         returnDocument: 'after'
       }
+    )
+    return result
+  }
+
+  async createSize({ user_id, product_id, size }: { user_id: string; product_id: string; size: number }) {
+    const result = await databaseService.sizes.insertOne(
+      new Size({
+        product_id: new ObjectId(product_id),
+        size_name: size,
+        description: 'Kích thước ' + size,
+        created_by: new ObjectId(user_id)
+      })
+    )
+    return result
+  }
+  async createColor({ user_id, product_id, color }: { user_id: string; product_id: string; color: string }) {
+    const result = await databaseService.colors.insertOne(
+      new Color({
+        product_id: new ObjectId(product_id),
+        color_name: color,
+        description: 'Màu sắc ' + color,
+        created_by: new ObjectId(user_id)
+      })
     )
     return result
   }

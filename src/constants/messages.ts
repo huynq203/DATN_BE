@@ -119,7 +119,9 @@ export const PRODUCTS_MESSAGES = {
   UPDATE_SUCCESS: 'Cập nhật sản phẩm thành công',
   DELETE_SUCCESS: 'Xóa sản phẩm thành công',
   PRODUCT_NOT_FOUND: 'Sản phẩm không tồn tại',
-  GET_PRODUCT_SUCCESS: 'Lấy sản phẩm thành công'
+  GET_PRODUCT_SUCCESS: 'Lấy sản phẩm thành công',
+  CREATE_SIZE_SUCCESS: 'Tạo kích thước thành công',
+  CREATE_COLOR_SUCCESS: 'Tạo màu sắc thành công'
 }
 
 export const MEDIA_MESSAGES = {

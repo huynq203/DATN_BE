@@ -9,7 +9,7 @@ interface OrderType {
   address: string
   order_status: OrderStatus
   payment_method: PaymentMethod
-  // payment_status: PaymentStatus
+  payment_status: PaymentStatus
   total_price: number
   coupon_code?: string
   order_details?: ObjectId[]
@@ -25,7 +25,7 @@ export default class Order {
   address: string
   order_status: OrderStatus
   payment_method: PaymentMethod
-  // payment_status: PaymentStatus
+  payment_status: PaymentStatus
   total_price: number
   order_details: ObjectId[]
   created_at?: Date
@@ -39,7 +39,7 @@ export default class Order {
     this.address = order.address
     this.order_status = order.order_status || OrderStatus.Pending
     this.payment_method = order.payment_method
-    // this.payment_status = order.payment_status
+    this.payment_status = order.payment_status
     this.total_price = order.total_price
     this.order_details = order.order_details || []
     this.created_at = order.created_at || date

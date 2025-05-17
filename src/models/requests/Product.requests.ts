@@ -3,7 +3,9 @@ export interface ProductReqBody {
   name: string
   description: string
   price: number
-  sizes: string[]
+  stock: number
+  color: string
+  size: number
 }
 
 export interface UpdateProductReqBody {

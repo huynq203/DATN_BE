@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import {
+  createColorController,
   createProductController,
+  createSizeController,
   deleteProductController,
   getAllProductController,
   getProductByIdController,
@@ -54,4 +56,11 @@ productsRouter.delete('/delete/product_id', accessTokenValidator, wrapRequestHan
 
 //Upload file
 productsRouter.post('/upload-image/:product_id', accessTokenValidator, wrapRequestHandler(uploadImageProductController))
+
+//Create thêm size
+productsRouter.post('/create-size/:product_id', accessTokenValidator, wrapRequestHandler(createSizeController))
+
+//Create thêm color
+productsRouter.post('/create-color/:product_id', accessTokenValidator, wrapRequestHandler(createColorController))
+
 export default productsRouter

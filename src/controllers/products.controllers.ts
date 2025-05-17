@@ -56,14 +56,15 @@ export const createProductController = async (
   next: NextFunction
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
+
   const result = await productsService.createProducts({
     user_id,
     payload: req.body
   })
 
   res.json({
-    message: PRODUCTS_MESSAGES.CREATE_PRODUCT_SUCCESS,
-    result
+    message: PRODUCTS_MESSAGES.CREATE_PRODUCT_SUCCESS
+    // result
   })
   return
 }
@@ -104,6 +105,36 @@ export const uploadImageProductController = async (req: Request, res: Response, 
 
   res.json({
     message: MEDIA_MESSAGES.UPLOAD_SUCCESS,
+    result
+  })
+  return
+}
+
+export const createSizeController = async (
+  req: Request<ParamsDictionary, any, ProductReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { product_id } = req.params
+  const { size } = req.body
+  const result = await productsService.createSize({ user_id, product_id, size })
+
+  res.json({
+    message: PRODUCTS_MESSAGES.CREATE_SIZE_SUCCESS,
+    result
+  })
+  return
+}
+
+export const createColorController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { product_id } = req.params
+  const { color } = req.body
+  const result = await productsService.createColor({ user_id, product_id, color })
+
+  res.json({
+    message: PRODUCTS_MESSAGES.CREATE_COLOR_SUCCESS,
     result
   })
   return

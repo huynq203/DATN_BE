@@ -51,4 +51,7 @@ export enum CartStatus {
   Canceled // Đã hủy - 2
 }
 
-
+export enum VnPayStatus {
+  Success = '00',
+  Cancel = '24'
+}

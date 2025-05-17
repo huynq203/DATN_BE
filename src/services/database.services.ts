@@ -12,6 +12,7 @@ import Size from '~/models/schemas/Size.schemas'
 import Order from '~/models/schemas/Orders.schemas'
 import Cart from '~/models/schemas/Cart.schemas'
 import OrderDetail from '~/models/schemas/OrderDetail.shemas'
+import Color from '~/models/schemas/Color.schemas'
 dotenv.config()
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@datn.phpnw.mongodb.net/?retryWrites=true&w=majority&appName=DATN`
 class DatabaseService {
@@ -56,6 +57,9 @@ class DatabaseService {
   }
   get sizes(): Collection<Size> {
     return this.db.collection(process.env.DB_SIZES_COLLECTION as string)
+  }
+  get colors(): Collection<Color> {
+    return this.db.collection(process.env.DB_COLORS_COLLECTION as string)
   }
   get orders(): Collection<Order> {
     return this.db.collection(process.env.DB_ORDERS_COLLECTION as string)

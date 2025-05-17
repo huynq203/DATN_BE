@@ -1,4 +1,4 @@
-import { PaymentMethod } from '~/constants/enums'
+import { PaymentMethod, PaymentStatus } from '~/constants/enums'
 
 export interface OrderReqBody {
   name: string
@@ -6,6 +6,7 @@ export interface OrderReqBody {
   address: string
   total_price: string
   payment_method: PaymentMethod
+  payment_status?: PaymentStatus
   order_details: {
     product_id: string
     quantity: number

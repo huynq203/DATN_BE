@@ -1,4 +1,4 @@
-import { CartStatus, OrderStatus, PaymentMethod } from '~/constants/enums'
+import { CartStatus, OrderStatus, PaymentMethod, PaymentStatus, VnPayStatus } from '~/constants/enums'
 import { OrderReqBody, OrderReqQuery } from '~/models/requests/Order.requests'
 import databaseService from './database.services'
 import { ObjectId } from 'mongodb'
@@ -19,6 +19,7 @@ class OrdersService {
     }
     return sorted
   }
+
   async createOrderCOD({ customer_id, payload }: { customer_id: string; payload: OrderReqBody }) {
     const order = await databaseService.orders.insertOne(
       new Order({
@@ -26,6 +27,7 @@ class OrdersService {
         address: payload.address,
         order_status: OrderStatus.Pending,
         payment_method: payload.payment_method,
+        payment_status: PaymentStatus.Unpaid,
         total_price: Number(payload.total_price)
       })
     )
@@ -76,8 +78,32 @@ class OrdersService {
       ])
     }
   }
-  async createOrderMomo({ customer_id, payload }: { customer_id: string; payload: OrderReqBody }) {}
+  // async createOrderMomo({ customer_id, payload }: { customer_id: string; payload: OrderReqBody }) {}
+
   async createOrderVnPay({ customer_id, payload, ip }: { customer_id: string; payload: OrderReqBody; ip: string }) {
+    const order = await databaseService.orders.insertOne(
+      new Order({
+        customer_id: new ObjectId(customer_id),
+        address: payload.address,
+        order_status: OrderStatus.Pending,
+        payment_method: payload.payment_method,
+        payment_status: PaymentStatus.Unpaid,
+        total_price: Number(payload.total_price)
+      })
+    )
+    await Promise.all(
+      payload.order_details.map((item) => {
+        return databaseService.order_details.insertOne(
+          new OrderDetail({
+            order_id: order.insertedId,
+            product_id: new ObjectId(item.product_id),
+            quantity: Number(item.quantity),
+            size: Number(item.size),
+            color: item.color
+          })
+        )
+      })
+    )
     const date = new Date()
     const createDate = moment(date).format('YYYYMMDDHHmmss')
     const amount = Number(payload.total_price)
@@ -87,7 +113,6 @@ class OrdersService {
     const vnp_Url = process.env.VNP_URL as string // Trang thanh toán của VNPay
     const ipAddr = ip
     // Logic sẽ nằm ở đây khi tạo đơn hàng
-    const orderId = moment().format('YYYYMMDDHHmmss')
     const bankCode = 'NCB'
     const orderInfo = 'Thanh_toan_don_hang'
     const locale = 'vn'
@@ -98,7 +123,7 @@ class OrdersService {
       vnp_TmnCode: tmnCode,
       vnp_Locale: locale,
       vnp_CurrCode: currCode,
-      vnp_TxnRef: orderId,
+      vnp_TxnRef: order.insertedId.toString(),
       vnp_OrderInfo: orderInfo,
       vnp_OrderType: 'billpayment',
       vnp_Amount: amount * 100,
@@ -107,7 +132,6 @@ class OrdersService {
       vnp_CreateDate: createDate,
       vnp_BankCode: bankCode
     }
-
     const stringified_vnpParams = Object.fromEntries(
       Object.entries(vnp_Params).map(([key, value]) => [key, String(value)])
     )
@@ -119,15 +143,114 @@ class OrdersService {
     const paymentUrl = vnp_Url + '?' + qs.stringify(sort_vnpParams)
     return paymentUrl
   }
-  async returnOrderVnPay({ payload }: { payload: OrderReqQuery }) {
+  async returnOrderVnPay({ customer_id, payload }: { customer_id: string; payload: OrderReqQuery }) {
+    const order_id = payload.vnp_TxnRef
+    const order = await databaseService.orders
+      .aggregate<OrderReqBody>([
+        {
+          $match: {
+            _id: new ObjectId(order_id),
+            customer_id: new ObjectId(customer_id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'order_details',
+            localField: '_id',
+            foreignField: 'order_id',
+            as: 'order_details'
+          }
+        }
+      ])
+      .toArray()
+
     const vnp_SecureHash = payload?.vnp_SecureHash
     const secretKey = process.env.VNP_HASH_SECRET as string
     delete payload.vnp_SecureHash
     const signData = qs.stringify(payload)
-
     const hmac = crypto.createHmac('sha512', secretKey)
     const checkSum = hmac.update(signData).digest('hex')
     if (checkSum === vnp_SecureHash) {
+      if (payload.vnp_ResponseCode === VnPayStatus.Success) {
+        await Promise.all([
+          ...order[0].order_details.map((item) => {
+            return databaseService.carts.updateOne(
+              {
+                customer_id: new ObjectId(customer_id),
+                product_id: new ObjectId(item.product_id),
+                color: item.color,
+                size: item.size
+              },
+              [
+                {
+                  $set: {
+                    status: CartStatus.Completed,
+                    updated_at: '$$NOW'
+                  }
+                }
+              ]
+            )
+          }),
+          ...order[0].order_details.map((item) => {
+            return databaseService.products.findOneAndUpdate(
+              {
+                _id: new ObjectId(item.product_id)
+                // color: item.color,
+                // size: item.size
+              },
+              {
+                $inc: { stock: -Number(item.quantity) },
+                $set: { updated_at: new Date() }
+              }
+            )
+          }),
+          databaseService.orders.updateOne(
+            {
+              _id: new ObjectId(order_id)
+            },
+            [
+              {
+                $set: {
+                  payment_status: PaymentStatus.Paid,
+                  updated_at: '$$NOW'
+                }
+              }
+            ]
+          )
+        ])
+      } else if (payload.vnp_ResponseCode === VnPayStatus.Cancel) {
+        await Promise.all([
+          order[0].order_details.map((item) => {
+            return databaseService.carts.updateOne(
+              {
+                customer_id: new ObjectId(customer_id),
+                product_id: new ObjectId(item.product_id),
+                color: item.color,
+                size: item.size
+              },
+              {
+                $set: {
+                  status: CartStatus.Canceled,
+                  updated_at: new Date()
+                }
+              }
+            )
+          }),
+          databaseService.orders.updateOne(
+            {
+              _id: new ObjectId(order_id)
+            },
+            [
+              {
+                $set: {
+                  order_status: OrderStatus.Canceled,
+                  updated_at: '$$NOW'
+                }
+              }
+            ]
+          )
+        ])
+      }
       return true
     }
     return false

@@ -35,11 +35,6 @@ export const createProductValidator = validate(
             return true
           }
         }
-      },
-      sizes: {
-        notEmpty: {
-          errorMessage: PRODUCTS_MESSAGES.SIZES_REQUIRED
-        }
       }
     },
     ['body']

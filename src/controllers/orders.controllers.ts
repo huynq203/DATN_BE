@@ -5,6 +5,7 @@ import { config } from 'dotenv'
 import { ORDERS_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Customer.requests'
 import ordersService from '~/services/orders.services'
+import { VnPayStatus } from '~/constants/enums'
 
 config()
 
@@ -29,7 +30,7 @@ export const orderMomoController = async (
 ) => {
   const { customer_id } = req.decoded_authorization as TokenPayload
   const payload = req.body
-  await ordersService.createOrderMomo({ customer_id, payload })
+  // await ordersService.createOrderMomo({ customer_id, payload })
   res.json({
     message: ORDERS_MESSAGES.ORDER_SUCCESS
   })
@@ -55,12 +56,13 @@ export const orderVnpayController = async (
 export const orderVnPayReturnController = async (req: Request, res: Response, next: NextFunction) => {
   const searchParam = req.query as unknown as OrderReqQuery
   const { customer_id } = req.decoded_authorization as TokenPayload
-  const order = req.body
-  const result = await ordersService.returnOrderVnPay({ payload: searchParam })
-
+  const result = await ordersService.returnOrderVnPay({ customer_id, payload: searchParam })
   if (result === true) {
-    if (searchParam.vnp_ResponseCode === '00') {
-      res.json({ message: 'Thanh toán thành công', result: searchParam })
+    if (searchParam.vnp_ResponseCode === VnPayStatus.Success) {
+      res.json({
+        message: 'Thanh toán thành công',
+        result: searchParam
+      })
     } else {
       res.json({ message: 'Thanh toán thất bại', result: searchParam })
     }
