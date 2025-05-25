@@ -13,7 +13,10 @@ import fsextra from 'fs-extra'
 class MediasSerive {
   async uploadImage(req: Request, folder: string) {
     //file tu uploads/tmp
+    // console.log(req)
+
     const files = await handleUploadImage(req)
+
     // return files
     //dùng Promise để hình ảnh cùng thực hiện chứ k phải đợi từng cái thực hiện
     const result: Media[] = await Promise.all(

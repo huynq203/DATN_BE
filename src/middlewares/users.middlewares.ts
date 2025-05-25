@@ -20,6 +20,7 @@ export const loginUserValidator = validate(
               email: value,
               password: hashPassword(req.body.password)
             })
+
             if (user === null) {
               throw new Error(COMMONS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
             }

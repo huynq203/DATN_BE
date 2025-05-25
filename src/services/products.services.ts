@@ -1,13 +1,20 @@
 import slug from 'slug'
-import { ProductReqBody, UpdateProductReqBody } from '~/models/requests/Product.requests'
+import {
+  OptionProductReqBody,
+  OptionProductUpdateReqBody,
+  ProductReqBody,
+  UpdateProductReqBody
+} from '~/models/requests/Product.requests'
 import Product from '~/models/schemas/Product.schema'
 import databaseService from './database.services'
 import { ObjectId } from 'mongodb'
 import mediasService from './medias.services'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 import { Media } from '~/models/Other'
-import Size from '~/models/schemas/Size.schemas'
-import Color from '~/models/schemas/Color.schemas'
+import OptionProduct from '~/models/schemas/OptionProduct.schemas'
+import ExcelJS from 'exceljs'
+import { PRODUCTS_MESSAGES } from '~/constants/messages'
+import { StatusType } from '~/constants/enums'
 class ProductsSerice {
   async getAllProducts({
     limit,
@@ -70,6 +77,11 @@ class ProductsSerice {
           ...(promotion_price ? [promotion_price] : []),
           ...(filterName ? [filterName] : []),
           {
+            $match: {
+              status: StatusType.Active // Assuming 1 means active products
+            }
+          },
+          {
             $lookup: {
               from: 'categories',
               localField: 'category_id',
@@ -77,48 +89,45 @@ class ProductsSerice {
               as: 'category_id'
             }
           },
+          { $unwind: '$category_id' },
           {
-            $unwind: {
-              path: '$categories',
-              preserveNullAndEmptyArrays: true
+            $lookup: {
+              from: 'option_products',
+              localField: '_id',
+              foreignField: 'product_id',
+              as: 'option_products'
             }
           },
           {
             $lookup: {
-              from: 'sizes',
-              localField: '_id',
-              foreignField: 'product_id',
-              as: 'sizes'
+              from: 'users',
+              localField: 'created_by',
+              foreignField: '_id',
+              as: 'created_by'
             }
           },
-          {
-            $lookup: {
-              from: 'colors',
-              localField: '_id',
-              foreignField: 'product_id',
-              as: 'colors'
-            }
-          },
+          { $unwind: '$created_by' },
           {
             $project: {
               _id: 1,
-              'category_id._id': 1,
-              'category_id.name': 1,
+              category_id: {
+                _id: '$category_id._id',
+                name: '$category_id.name'
+              },
               name: 1,
               description: 1,
               slug: 1,
               url_images: 1,
               price: 1,
               promotion_price: 1,
-              'sizes._id': 1,
-              'sizes.size_name': 1,
-              'colors._id': 1,
-              'colors.color_name': 1,
+
               status: 1,
               view: 1,
               sold: 1,
-              stock: 1,
-              created_by: 1,
+              created_by: {
+                _id: '$created_by._id',
+                name: '$created_by.name'
+              },
               created_at: 1,
               updated_at: 1
             }
@@ -139,6 +148,11 @@ class ProductsSerice {
       databaseService.products
         .aggregate([
           {
+            $match: {
+              status: StatusType.Active // Assuming 1 means active products
+            }
+          },
+          {
             $lookup: {
               from: 'categories',
               localField: 'category_id',
@@ -146,48 +160,13 @@ class ProductsSerice {
               as: 'category_id'
             }
           },
-          {
-            $unwind: {
-              path: '$categories',
-              preserveNullAndEmptyArrays: true
-            }
-          },
+          { $unwind: '$category_id' },
           {
             $lookup: {
-              from: 'sizes',
+              from: 'option_products',
               localField: '_id',
               foreignField: 'product_id',
-              as: 'sizes'
-            }
-          },
-          {
-            $lookup: {
-              from: 'colors',
-              localField: '_id',
-              foreignField: 'product_id',
-              as: 'colors'
-            }
-          },
-
-          {
-            $project: {
-              _id: 1,
-              'category_id._id': 1,
-              'category_id.name': 1,
-              name: 1,
-              description: 1,
-              slug: 1,
-              url_images: 1,
-              price: 1,
-              promotion_price: 1,
-              'sizes._id': 1,
-              'sizes.size_name': 1,
-              'colors._id': 1,
-              'colors.color_name': 1,
-              status: 1,
-              view: 1,
-              sold: 1,
-              stock: 1
+              as: 'option_products'
             }
           },
           {
@@ -230,47 +209,48 @@ class ProductsSerice {
             as: 'category_id'
           }
         },
+        { $unwind: '$category_id' },
         {
-          $unwind: {
-            path: '$categories',
-            preserveNullAndEmptyArrays: true
+          $lookup: {
+            from: 'option_products',
+            localField: '_id',
+            foreignField: 'product_id',
+            as: 'option_products'
           }
         },
         {
           $lookup: {
-            from: 'sizes',
-            localField: '_id',
-            foreignField: 'product_id',
-            as: 'sizes'
+            from: 'users',
+            localField: 'created_by',
+            foreignField: '_id',
+            as: 'created_by'
           }
         },
-        {
-          $lookup: {
-            from: 'colors',
-            localField: '_id',
-            foreignField: 'product_id',
-            as: 'colors'
-          }
-        },
+        { $unwind: '$created_by' },
         {
           $project: {
             _id: 1,
-            'category_id._id': 1,
-            'category_id.name': 1,
+            category_id: {
+              _id: '$category_id._id',
+              name: '$category_id.name'
+            },
             name: 1,
             description: 1,
             slug: 1,
             url_images: 1,
             price: 1,
             promotion_price: 1,
-            'sizes._id': 1,
-            'sizes.size_name': 1,
-            'colors._id': 1,
-            'colors.color_name': 1,
+            option_products: 1,
             status: 1,
             view: 1,
             sold: 1,
-            stock: 1
+            stock: 1,
+            created_by: {
+              _id: '$created_by._id',
+              name: '$created_by.name'
+            },
+            created_at: 1,
+            updated_at: 1
           }
         }
       ])
@@ -284,26 +264,19 @@ class ProductsSerice {
       new Product({
         name: payload.name,
         description: payload.description,
-        price: payload.price,
-        stock: payload.stock,
+        price: Number(payload.price),
         category_id: new ObjectId(payload.category_id),
         slug: generatedSlug,
-        created_by: new ObjectId(user_id)
+        created_by: new ObjectId(user_id),
+        url_images: payload.url_images
       })
     )
-    await databaseService.sizes.insertOne(
-      new Size({
+    await databaseService.optionproducts.insertOne(
+      new OptionProduct({
         product_id: product.insertedId,
-        size_name: Number(payload.size),
-        description: 'Kích thước ' + payload.size,
-        created_by: new ObjectId(user_id)
-      })
-    )
-    await databaseService.colors.insertOne(
-      new Color({
-        product_id: new ObjectId(product.insertedId),
-        color_name: payload.color,
-        description: 'Màu sắc ' + payload.color,
+        size: Number(payload.size),
+        color: payload.color,
+        stock: Number(payload.stock),
         created_by: new ObjectId(user_id)
       })
     )
@@ -313,22 +286,15 @@ class ProductsSerice {
     })
     return result
   }
-  async updateProducts({
-    user_id,
-    product_id,
-    payload
-  }: {
-    user_id: string
-    product_id: string
-    payload: UpdateProductReqBody
-  }) {
+  async updateProducts({ user_id, payload }: { user_id: string; payload: UpdateProductReqBody }) {
     const _payload = payload.name ? { ...payload, slug: slug(payload.name) } : payload
     const result = await databaseService.products.findOneAndUpdate(
-      { _id: new ObjectId(product_id) },
+      { _id: new ObjectId(payload.product_id) },
       [
         {
           $set: {
             ..._payload,
+            price: Number(payload.price),
             created_by: new ObjectId(user_id),
             updated_at: '$$NOW'
           }
@@ -346,7 +312,7 @@ class ProductsSerice {
     })
   }
 
-  async uploadImageProduct({ user_id, product_id, req }: { user_id: string; product_id: string; req: Request }) {
+  async uploadImagebyProduct({ user_id, product_id, req }: { user_id: string; product_id: string; req: Request }) {
     const url_images = await mediasService.uploadImage(req, 'products')
     const product = await databaseService.products.findOne({
       _id: new ObjectId(product_id)
@@ -374,26 +340,224 @@ class ProductsSerice {
     return result
   }
 
-  async createSize({ user_id, product_id, size }: { user_id: string; product_id: string; size: number }) {
-    const result = await databaseService.sizes.insertOne(
-      new Size({
-        product_id: new ObjectId(product_id),
-        size_name: size,
-        description: 'Kích thước ' + size,
-        created_by: new ObjectId(user_id)
-      })
-    )
+  async uploadImageProduct({ req }: { req: Request }) {
+    const url_images = await mediasService.uploadImage(req, 'products')
+    return url_images
+  }
+
+  async getAllProductManager() {
+    const result = await databaseService.products
+      .aggregate([
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'category_id',
+            foreignField: '_id',
+            as: 'category_id'
+          }
+        },
+        { $unwind: '$category_id' },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'created_by',
+            foreignField: '_id',
+            as: 'created_by'
+          }
+        },
+        { $unwind: '$created_by' },
+        {
+          $sort: {
+            created_at: -1
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            category_id: {
+              _id: '$category_id._id',
+              name: '$category_id.name'
+            },
+            name: 1,
+            description: 1,
+            slug: 1,
+            price: 1,
+            promotion_price: 1,
+            status: 1,
+            url_images: 1,
+            view: 1,
+            sold: 1,
+            created_by: {
+              _id: '$created_by._id',
+              name: '$created_by.name'
+            },
+            created_at: 1,
+            updated_at: 1
+          }
+        }
+      ])
+      .toArray()
+
     return result
   }
-  async createColor({ user_id, product_id, color }: { user_id: string; product_id: string; color: string }) {
-    const result = await databaseService.colors.insertOne(
-      new Color({
-        product_id: new ObjectId(product_id),
-        color_name: color,
-        description: 'Màu sắc ' + color,
-        created_by: new ObjectId(user_id)
+  async getOptionProduct(product_id: string) {
+    const result = await databaseService.optionproducts
+      .aggregate([
+        {
+          $match: {
+            product_id: new ObjectId(product_id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'created_by',
+            foreignField: '_id',
+            as: 'created_by'
+          }
+        },
+        { $sort: { created_at: -1 } }
+      ])
+      .toArray()
+    return result
+  }
+
+  async createOptionProduct({ user_id, payload }: { user_id: string; payload: OptionProductReqBody }) {
+    const findOptionProduct = await databaseService.optionproducts.findOne({
+      product_id: new ObjectId(payload.product_id),
+      size: Number(payload.size),
+      color: payload.color
+    })
+    if (findOptionProduct) {
+      const result = await databaseService.optionproducts.findOneAndUpdate(
+        {
+          _id: findOptionProduct._id
+        },
+        {
+          $inc: {
+            stock: Number(payload.stock)
+          },
+          $set: {
+            updated_at: new Date()
+          }
+        },
+        {
+          returnDocument: 'after'
+        }
+      )
+      return result
+    } else {
+      const optionProduct = await databaseService.optionproducts.insertOne(
+        new OptionProduct({
+          product_id: new ObjectId(payload.product_id),
+          size: Number(payload.size),
+          color: payload.color,
+          stock: Number(payload.stock),
+          created_by: new ObjectId(user_id)
+        })
+      )
+      const result = await databaseService.optionproducts.findOne({
+        _id: optionProduct.insertedId
       })
-    )
+      return result
+    }
+  }
+  async updateOptionProduct({ user_id, payload }: { user_id: string; payload: OptionProductUpdateReqBody }) {
+    const optionProduct = await databaseService.optionproducts.findOne({
+      product_id: new ObjectId(payload.product_id),
+      size: Number(payload.size),
+      color: payload.color
+    })
+    if (optionProduct) {
+      throw new Error(PRODUCTS_MESSAGES.OPTION_PRODUCT_EXISTS)
+    } else {
+      const result = await databaseService.optionproducts.findOneAndUpdate(
+        {
+          _id: new ObjectId(payload.optionProduct_id)
+        },
+        {
+          $set: {
+            size: Number(payload.size),
+            color: payload.color,
+            stock: Number(payload.stock),
+            updated_at: new Date(),
+            created_by: new ObjectId(user_id)
+          }
+        },
+        {
+          returnDocument: 'after'
+        }
+      )
+      return result
+    }
+  }
+  async deleteOptionProduct(optionProduct_id: string) {
+    await databaseService.optionproducts.deleteOne({
+      _id: new ObjectId(optionProduct_id)
+    })
+  }
+  async exportFile({ req, res }: { req: Request; res: Response }) {
+    const products = await databaseService.products
+      .aggregate([
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'category_id',
+            foreignField: '_id',
+            as: 'category_id'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'created_by',
+            foreignField: '_id',
+            as: 'created_by'
+          }
+        },
+        {
+          $sort: {
+            created_at: -1
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            'category_id.name': 1,
+            name: 1,
+            description: 1,
+            slug: 1,
+            price: 1,
+            promotion_price: 1,
+            'created_by.name': 1,
+            created_at: 1,
+            updated_at: 1
+          }
+        }
+      ])
+      .toArray()
+
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Products')
+
+    worksheet.columns = [
+      { header: 'ID', key: '_id', width: 30 },
+      { header: 'Category', key: 'category_id', width: 30 },
+      { header: 'Name', key: 'name', width: 30 },
+      { header: 'Description', key: 'description', width: 30 },
+      { header: 'Slug', key: 'slug', width: 30 },
+      { header: 'Price', key: 'price', width: 15 },
+      { header: 'Promotion Price', key: 'promotion_price', width: 15 },
+      { header: 'Created By', key: 'created_by', width: 30 },
+      { header: 'Created At', key: 'created_at', width: 20 },
+      { header: 'Updated At', key: 'updated_at', width: 20 }
+    ]
+    products.forEach((item) => {
+      worksheet.addRow(item)
+    })
+
+    const result = await workbook.xlsx.write(res)
+    res.end()
     return result
   }
 }

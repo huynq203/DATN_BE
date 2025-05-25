@@ -1,6 +1,7 @@
 import { PaymentMethod, PaymentStatus } from '~/constants/enums'
 
 export interface OrderReqBody {
+  _id?: string
   name: string
   phone: string
   address: string
@@ -8,6 +9,7 @@ export interface OrderReqBody {
   payment_method: PaymentMethod
   payment_status?: PaymentStatus
   order_details: {
+    cart_id: string
     product_id: string
     quantity: number
     size: number

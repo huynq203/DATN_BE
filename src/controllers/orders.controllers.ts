@@ -18,7 +18,8 @@ export const orderCodController = async (
   const payload = req.body
   await ordersService.createOrderCOD({ customer_id, payload })
   res.json({
-    message: ORDERS_MESSAGES.ORDER_SUCCESS
+    message: ORDERS_MESSAGES.ORDER_SUCCESS,
+    payment_method: payload.payment_method
   })
   return
 }
@@ -57,14 +58,14 @@ export const orderVnPayReturnController = async (req: Request, res: Response, ne
   const searchParam = req.query as unknown as OrderReqQuery
   const { customer_id } = req.decoded_authorization as TokenPayload
   const result = await ordersService.returnOrderVnPay({ customer_id, payload: searchParam })
-  if (result === true) {
+  if (result.check === true) {
     if (searchParam.vnp_ResponseCode === VnPayStatus.Success) {
       res.json({
         message: 'Thanh toán thành công',
-        result: searchParam
+        result: { ...searchParam, payment_method: result.payment_method }
       })
     } else {
-      res.json({ message: 'Thanh toán thất bại', result: searchParam })
+      res.json({ message: 'Thanh toán thất bại', result: { ...searchParam, payment_method: result.payment_method } })
     }
   } else {
     res.json({ message: 'Dữ liệu không hợp lệ', result: searchParam })

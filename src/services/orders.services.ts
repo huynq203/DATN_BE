@@ -9,6 +9,7 @@ import crypto from 'crypto'
 import moment from 'moment'
 import { sortObject } from '~/utils/utils'
 import { config } from 'dotenv'
+import { sendOrder } from '~/utils/email'
 config()
 class OrdersService {
   sortObject(obj: Record<string, string>) {
@@ -44,15 +45,13 @@ class OrdersService {
         )
       })
     )
+
     if (order) {
       await Promise.all([
-        payload.order_details.map((item) => {
+        ...payload.order_details.map((item) => {
           return databaseService.carts.updateOne(
             {
-              customer_id: new ObjectId(customer_id),
-              product_id: new ObjectId(item.product_id),
-              color: item.color,
-              size: item.size
+              _id: new ObjectId(item.cart_id)
             },
             {
               $set: {
@@ -62,12 +61,12 @@ class OrdersService {
             }
           )
         }),
-        payload.order_details.map((item) => {
-          return databaseService.products.findOneAndUpdate(
+        ...payload.order_details.map((item) => {
+          return databaseService.optionproducts.findOneAndUpdate(
             {
-              _id: new ObjectId(item.product_id)
-              // color: item.color,
-              // size: item.size
+              product_id: new ObjectId(item.product_id),
+              color: item.color,
+              size: item.size
             },
             {
               $inc: { stock: -Number(item.quantity) },
@@ -97,6 +96,7 @@ class OrdersService {
           new OrderDetail({
             order_id: order.insertedId,
             product_id: new ObjectId(item.product_id),
+            cart_id: new ObjectId(item.cart_id),
             quantity: Number(item.quantity),
             size: Number(item.size),
             color: item.color
@@ -163,7 +163,9 @@ class OrdersService {
         }
       ])
       .toArray()
-
+    const customer = await databaseService.customers.findOne({
+      _id: new ObjectId(customer_id)
+    })
     const vnp_SecureHash = payload?.vnp_SecureHash
     const secretKey = process.env.VNP_HASH_SECRET as string
     delete payload.vnp_SecureHash
@@ -171,15 +173,13 @@ class OrdersService {
     const hmac = crypto.createHmac('sha512', secretKey)
     const checkSum = hmac.update(signData).digest('hex')
     if (checkSum === vnp_SecureHash) {
+
       if (payload.vnp_ResponseCode === VnPayStatus.Success) {
         await Promise.all([
           ...order[0].order_details.map((item) => {
             return databaseService.carts.updateOne(
               {
-                customer_id: new ObjectId(customer_id),
-                product_id: new ObjectId(item.product_id),
-                color: item.color,
-                size: item.size
+                _id: new ObjectId(item.cart_id)
               },
               [
                 {
@@ -192,11 +192,11 @@ class OrdersService {
             )
           }),
           ...order[0].order_details.map((item) => {
-            return databaseService.products.findOneAndUpdate(
+            return databaseService.optionproducts.findOneAndUpdate(
               {
-                _id: new ObjectId(item.product_id)
-                // color: item.color,
-                // size: item.size
+                product_id: new ObjectId(item.product_id),
+                color: item.color,
+                size: item.size
               },
               {
                 $inc: { stock: -Number(item.quantity) },
@@ -216,17 +216,15 @@ class OrdersService {
                 }
               }
             ]
-          )
+          ),
+          sendOrder(customer?.email as string, order[0]?._id as string)
         ])
       } else if (payload.vnp_ResponseCode === VnPayStatus.Cancel) {
         await Promise.all([
-          order[0].order_details.map((item) => {
+          ...order[0].order_details.map((item) => {
             return databaseService.carts.updateOne(
               {
-                customer_id: new ObjectId(customer_id),
-                product_id: new ObjectId(item.product_id),
-                color: item.color,
-                size: item.size
+                _id: new ObjectId(item.cart_id)
               },
               {
                 $set: {
@@ -251,9 +249,12 @@ class OrdersService {
           )
         ])
       }
-      return true
+      return {
+        check: true,
+        payment_method: PaymentMethod.VNPAY
+      }
     }
-    return false
+    return { check: false }
   }
 }
 const ordersService = new OrdersService()

@@ -6,21 +6,11 @@ import { TokenPayload } from '~/models/requests/Customer.requests'
 import categoriesService from '~/services/categories.services'
 
 export const getAllCategoriesController = async (req: Request, res: Response, next: NextFunction) => {
-  const page = Number(req.query.page) || 1
-  const limit = Number(req.query.limit) || 10
-  const data = await categoriesService.getAllCategories({
-    limit,
-    page
-  })
+  const categories = await categoriesService.getAllCategories()
   res.json({
     message: CATEGORIES_MESSAGES.GET_CATEGORY_SUCCESS,
     result: {
-      categories: data.categories,
-      pagination: {
-        page,
-        limit,
-        total_page: Math.ceil(data.total / limit)
-      }
+      categories
     }
   })
   return
@@ -41,7 +31,10 @@ export const createCategoryController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const result = await categoriesService.createCategory(req.body)
+  const { user_id } = req.decoded_authorization as TokenPayload
+  console.log(req.body)
+
+  const result = await categoriesService.createCategory({ user_id, payload: req.body })
   res.json({
     message: CATEGORIES_MESSAGES.CREATE_SUCCESS,
     result
@@ -55,10 +48,9 @@ export const updateCategoryController = async (
   next: NextFunction
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  const { product_id } = req.params
+
   const result = await categoriesService.updateCategory({
     user_id,
-    product_id,
     payload: req.body
   })
 
@@ -69,13 +61,9 @@ export const updateCategoryController = async (
   return
 }
 
-export const deleteCategoryController = async (
-  req: Request<ParamsDictionary, any, CategoryReqBody>,
-  res: Response,
-  next: NextFunction
-) => {
-  const { product_id } = req.params
-  await categoriesService.deleteCategory(product_id)
+export const deleteCategoryController = async (req: Request, res: Response, next: NextFunction) => {
+  const { category_id } = req.body
+  await categoriesService.deleteCategory(category_id)
   res.json({
     message: CATEGORIES_MESSAGES.DELETE_SUCCESS
   })

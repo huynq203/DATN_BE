@@ -8,7 +8,7 @@ import {
   RegisterReqBody,
   resetPassword,
   TokenPayload,
-  UpdateMeRequestBody,
+  UpdateProfileRequestBody,
   VerifyEmailReqBody,
   verifyForgotPasswordReqBody
 } from '~/models/requests/Customer.requests'
@@ -20,11 +20,34 @@ import customersService from '~/services/customers.services'
 import { COMMONS_MESSAGES, CUSTOMERS_MESSAGES } from '~/constants/messages'
 import Customer from '~/models/schemas/Customer.schemas'
 import dotenv from 'dotenv'
-import { access } from 'fs'
+
 dotenv.config()
 
-export const getAllCustomersController = async (req: Request, res: Response, next: NextFunction) => {}
-export const deleteCustomerController = async (req: Request, res: Response, next: NextFunction) => {}
+export const getAllCustomersController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await customersService.getAllCustomers()
+  res.json({
+    message: CUSTOMERS_MESSAGES.GET_ALL_CUSTOMERS_SUCCESS,
+    result
+  })
+}
+
+export const getCustomerByIdController = async (req: Request, res: Response, next: NextFunction) => {
+  const { customer_id } = req.params
+  const result = await customersService.getCustomerById(customer_id)
+
+  res.json({
+    message: CUSTOMERS_MESSAGES.GET_CUSTOMER_BY_ID_SUCCESS,
+    result
+  })
+}
+export const updateCustomerController = async (req: Request, res: Response, next: NextFunction) => {}
+export const deleteCustomerController = async (req: Request, res: Response, next: NextFunction) => {
+  const { customer_id } = req.body
+  await customersService.deleteCustomer(customer_id)
+  res.json({
+    message: CUSTOMERS_MESSAGES.DELETE_CUSTOMER_SUCCESS
+  })
+}
 
 export const registerController = async (
   req: Request<ParamsDictionary, any, RegisterReqBody>,
@@ -51,12 +74,7 @@ export const loginController = async (
   res.cookie('refresh_token', result.refresh_token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
   res.json({
     message: COMMONS_MESSAGES.LOGIN_SUCCESS,
-    result: {
-      access_token: result.access_token,
-      refresh_token: result.refresh_token,
-      expires: result.expires,
-      customer: result.customer
-    }
+    result
   })
   return
 }
@@ -82,9 +100,9 @@ export const logoutController = async (
   return
 }
 
-export const getMeController = async (req: Request, res: Response, next: NextFunction) => {
+export const getProfileController = async (req: Request, res: Response, next: NextFunction) => {
   const { customer_id } = req.decoded_authorization as TokenPayload
-  const result = await customersService.getMe(customer_id)
+  const result = await customersService.getProfile(customer_id)
   res.json({
     message: CUSTOMERS_MESSAGES.GET_ME_SUCCESS,
     result
@@ -92,15 +110,15 @@ export const getMeController = async (req: Request, res: Response, next: NextFun
   return
 }
 
-export const updatetMeController = async (
-  req: Request<ParamsDictionary, any, UpdateMeRequestBody>,
+export const updatetProfileController = async (
+  req: Request<ParamsDictionary, any, UpdateProfileRequestBody>,
   res: Response,
   next: NextFunction
 ) => {
   const { customer_id } = req.decoded_authorization as TokenPayload
   const { body } = req
 
-  const result = await customersService.updateMe(customer_id, body)
+  const result = await customersService.updateProfile(customer_id, body)
   res.json({
     message: CUSTOMERS_MESSAGES.UPDATE_ME_SUCCESS,
     result

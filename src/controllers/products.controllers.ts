@@ -2,7 +2,12 @@ import { Request, Response, NextFunction } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { MEDIA_MESSAGES, PRODUCTS_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Customer.requests'
-import { ProductReqBody } from '~/models/requests/Product.requests'
+import {
+  OptionProductReqBody,
+  OptionProductUpdateReqBody,
+  ProductReqBody,
+  UpdateProductReqBody
+} from '~/models/requests/Product.requests'
 import productsService from '~/services/products.services'
 
 export const getAllProductController = async (req: Request, res: Response, next: NextFunction) => {
@@ -61,25 +66,22 @@ export const createProductController = async (
     user_id,
     payload: req.body
   })
-
   res.json({
-    message: PRODUCTS_MESSAGES.CREATE_PRODUCT_SUCCESS
-    // result
+    message: PRODUCTS_MESSAGES.CREATE_PRODUCT_SUCCESS,
+    result
   })
   return
 }
 
 export const updateProductController = async (
-  req: Request<ParamsDictionary, any, ProductReqBody>,
+  req: Request<ParamsDictionary, any, UpdateProductReqBody>,
   res: Response,
   next: NextFunction
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  const { product_id } = req.params
 
   const result = await productsService.updateProducts({
     user_id,
-    product_id,
     payload: req.body
   })
   res.json({
@@ -90,7 +92,8 @@ export const updateProductController = async (
 }
 
 export const deleteProductController = async (req: Request, res: Response, next: NextFunction) => {
-  const { product_id } = req.params
+  const { product_id } = req.body
+
   await productsService.deleteProducts(product_id)
   res.json({
     message: PRODUCTS_MESSAGES.DELETE_SUCCESS
@@ -98,11 +101,10 @@ export const deleteProductController = async (req: Request, res: Response, next:
   return
 }
 
-export const uploadImageProductController = async (req: Request, res: Response, next: NextFunction) => {
+export const uploadImageByProductController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { product_id } = req.params
-  const result = await productsService.uploadImageProduct({ user_id, product_id, req })
-
+  const result = await productsService.uploadImagebyProduct({ user_id, product_id, req })
   res.json({
     message: MEDIA_MESSAGES.UPLOAD_SUCCESS,
     result
@@ -110,32 +112,71 @@ export const uploadImageProductController = async (req: Request, res: Response, 
   return
 }
 
-export const createSizeController = async (
-  req: Request<ParamsDictionary, any, ProductReqBody>,
+export const uploadImageProductController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await productsService.uploadImageProduct({ req })
+  res.json({
+    message: MEDIA_MESSAGES.UPLOAD_SUCCESS,
+    result
+  })
+}
+
+export const getAllProductManagerController = async (req: Request, res: Response, next: NextFunction) => {
+  const products = await productsService.getAllProductManager()
+  res.json({
+    message: PRODUCTS_MESSAGES.GET_PRODUCT_SUCCESS,
+    result: {
+      products
+    }
+  })
+}
+
+export const getOptionProductController = async (req: Request, res: Response, next: NextFunction) => {
+  const { product_id } = req.params
+  const result = await productsService.getOptionProduct(product_id)
+  res.json({
+    message: PRODUCTS_MESSAGES.GET_OPTION_PRODUCT_SUCCESS,
+    result
+  })
+}
+
+export const createOptionProductController = async (
+  req: Request<ParamsDictionary, any, OptionProductReqBody>,
   res: Response,
   next: NextFunction
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  const { product_id } = req.params
-  const { size } = req.body
-  const result = await productsService.createSize({ user_id, product_id, size })
-
+  const result = await productsService.createOptionProduct({ user_id, payload: req.body })
   res.json({
-    message: PRODUCTS_MESSAGES.CREATE_SIZE_SUCCESS,
+    message: PRODUCTS_MESSAGES.CREATE_OPTION_PRODUCT_SUCCESS,
     result
   })
-  return
 }
 
-export const createColorController = async (req: Request, res: Response, next: NextFunction) => {
+export const updateOptionProductController = async (
+  req: Request<ParamsDictionary, any, OptionProductUpdateReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  const { product_id } = req.params
-  const { color } = req.body
-  const result = await productsService.createColor({ user_id, product_id, color })
-
+  const result = await productsService.updateOptionProduct({ user_id, payload: req.body })
   res.json({
-    message: PRODUCTS_MESSAGES.CREATE_COLOR_SUCCESS,
+    message: PRODUCTS_MESSAGES.UPDATE_OPTION_PRODUCT_SUCCESS,
     result
   })
-  return
+}
+
+export const deleteOptionProductController = async (req: Request, res: Response, next: NextFunction) => {
+  const { optionProduct_id } = req.body
+  await productsService.deleteOptionProduct(optionProduct_id)
+  res.json({
+    message: PRODUCTS_MESSAGES.DELETE_OPTION_PRODUCT_SUCCESS
+  })
+}
+
+export const exportFileController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await productsService.exportFile({ req, res })
+  res.json({
+    message: PRODUCTS_MESSAGES.EXPORT_FILE_SUCCESS,
+    result
+  })
 }

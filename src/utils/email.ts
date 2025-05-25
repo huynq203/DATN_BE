@@ -5,7 +5,7 @@ import path from 'path'
 import { config } from 'dotenv'
 config()
 const verifyEmailTemplates = fs.readFileSync(path.resolve('src/templates/email-verify.html'), 'utf8')
-
+const orderTeplates = fs.readFileSync(path.resolve('src/templates/email-order.html'), 'utf8')
 // Create SES service object.
 const sesClient = new SESClient({
   region: process.env.AWS_REGION,
@@ -94,5 +94,21 @@ export const sendForgotPasswordEmail = (
       .replace('{{content}}', 'Nhấp vào nút bên dưới để đặt lại mật khẩu của bạn')
       .replace('{{titleLink}}', 'Đặt lại mật khẩu')
       .replace('{{link}}', `${process.env.CLIENT_URL}/auth/verify-forgot-password?token=${forgot_password_token}`)
+  )
+}
+
+export const sendOrder = (
+  toAddress: string,
+  order_id: string,
+  template: string = orderTeplates
+) => {
+  return sendVerifyEmail(
+    toAddress,
+    'Đặt hàng thành công',
+    template
+      .replace('{{title}}', 'Bạn đã đặt thành công một đơn hàng tại cửa hàng YoyoStore')
+      .replace('{{content}}', 'Click vào nút bên dưới để xem đơn hàng của bạn')
+      .replace('{{titleLink}}', 'Xem đơn hàng')
+      .replace('{{link}}', `${process.env.CLIENT_URL}/history-order/${order_id}`)
   )
 }

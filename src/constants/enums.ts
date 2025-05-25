@@ -55,3 +55,8 @@ export enum VnPayStatus {
   Success = '00',
   Cancel = '24'
 }
+
+export enum StatusType {
+  Inactive,
+  Active
+}

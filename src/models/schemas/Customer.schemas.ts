@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb'
-import { UserVerifyStatus } from '~/constants/enums'
+import { StatusType, UserVerifyStatus } from '~/constants/enums'
 
 interface CustomerType {
   _id?: ObjectId
@@ -12,6 +12,7 @@ interface CustomerType {
   email_verify_token?: string //jwt hoặc '' nếu đã xác thực email
   forgot_password_token?: string //jwt hoặc '' nếu đã xác thực email
   verify?: UserVerifyStatus
+  status?: StatusType
   cart?: ObjectId[]
   wishlist?: ObjectId[]
   created_at?: Date
@@ -28,6 +29,7 @@ export default class Customer {
   email_verify_token?: string //jwt hoặc '' nếu đã xác thực email
   forgot_password_token?: string //jwt hoặc '' nếu đã xác thực email
   verify: UserVerifyStatus
+  status: StatusType
   cart: ObjectId[]
   wishlist: ObjectId[]
   created_at: Date
@@ -43,6 +45,7 @@ export default class Customer {
     this.email_verify_token = customer.email_verify_token || ''
     this.forgot_password_token = customer.forgot_password_token || ''
     this.verify = customer.verify || UserVerifyStatus.Unverified
+    this.status = customer.status || StatusType.Active
     this.cart = customer.cart || []
     this.wishlist = customer.wishlist || []
     this.created_at = customer.created_at || date

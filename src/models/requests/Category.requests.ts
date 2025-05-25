@@ -4,12 +4,11 @@ export interface CategoryReqBody {
   name: string
   description: string
   slug?: string
-  created_by: ObjectId
 }
 
 export interface UpdateCategoryReqBody {
+  category_id: string
   name?: string
   description?: string
   slug?: string
-  created_by: ObjectId
 }

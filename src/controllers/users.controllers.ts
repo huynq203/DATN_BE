@@ -24,6 +24,7 @@ export const loginUserController = async (
   const user_id = user._id as ObjectId
   const role = user.role as ObjectId
   const result = await usersService.loginUser({ user_id: user_id.toString(), role: role.toString() })
+
   res.json({
     message: COMMONS_MESSAGES.LOGIN_SUCCESS,
     result

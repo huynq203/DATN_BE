@@ -68,3 +68,5 @@ export const updateProductValidator = validate(
     ['body']
   )
 )
+
+

@@ -65,9 +65,33 @@ class UsersService {
         exp: Number(exp)
       })
     )
+    const user = await databaseService.users
+      .aggregate([
+        {
+          $match: { _id: new ObjectId(user_id) }
+        },
+        {
+          $lookup: {
+            from: 'roles',
+            localField: 'role',
+            foreignField: '_id',
+            as: 'role'
+          }
+        },
+        {
+          $project: {
+            name: 1,
+            role: 1
+          }
+        }
+      ])
+      .toArray()
+
     return {
       access_token,
-      refresh_token
+      refresh_token,
+      user: user[0],
+      role: user[0].role[0].role_name
     }
   }
 
@@ -119,7 +143,6 @@ class UsersService {
       }
     }
   }
-
 }
 
 const usersService = new UsersService()

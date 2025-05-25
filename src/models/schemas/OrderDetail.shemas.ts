@@ -4,6 +4,7 @@ interface OrderDetailType {
   _id?: ObjectId
   order_id: ObjectId
   product_id: ObjectId
+  cart_id?: ObjectId
   quantity: number
   size: number
   color: string
@@ -15,6 +16,7 @@ export default class OrderDetail {
   _id: ObjectId
   order_id: ObjectId
   product_id: ObjectId
+  cart_id: ObjectId
   quantity: number
   size: number
   color: string
@@ -26,6 +28,7 @@ export default class OrderDetail {
     this._id = orderDetail._id || new ObjectId()
     this.order_id = orderDetail.order_id
     this.product_id = orderDetail.product_id
+    this.cart_id = orderDetail.cart_id || new ObjectId()
     this.quantity = orderDetail.quantity
     this.size = orderDetail.size
     this.color = orderDetail.color

@@ -2,11 +2,20 @@ import { Router } from 'express'
 import {
   createAddressController,
   deleteAddressController,
+  getAddressController,
   updateAddressController
 } from '~/controllers/addresses.controllers'
 import { accessTokenValidator } from '~/middlewares/commons.middlewares'
 import { wrapRequestHandler } from '~/utils/hanlders'
 const addressesRouter = Router()
+
+/**
+ * Description: Gett address
+ * Path: /
+ * Method: GET
+ * Headers: {Authorization: Bearer <access_token>}
+ */
+addressesRouter.get('/', accessTokenValidator, wrapRequestHandler(getAddressController))
 
 /**
  * Description: Create a new address

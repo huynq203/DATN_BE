@@ -31,9 +31,8 @@ export interface VerifyEmailReqBody {
   email_verify_token: string
 }
 
-export interface UpdateMeRequestBody {
+export interface UpdateProfileRequestBody {
   name?: string
-  email?: string
   phone?: string
   date_of_birth?: Date
 }

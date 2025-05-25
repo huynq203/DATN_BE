@@ -5,14 +5,16 @@ import {
   deleteCustomerController,
   forgotPasswordController,
   getAllCustomersController,
-  getMeController,
+  getCustomerByIdController,
+  getProfileController,
   loginController,
   logoutController,
   oauthController,
   registerController,
   resendVerifyEmailController,
   resetPasswordController,
-  updatetMeController,
+  updateCustomerController,
+  updatetProfileController,
   verifyEmailController,
   verifyForgotPasswordController
 } from '~/controllers/customers.controllers'
@@ -70,7 +72,7 @@ customersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wra
  * Header: {Authorization: Bearer <access_token>}
  * Headers: {Authorization: Bearer <access_token>}
  */
-customersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeController))
+customersRouter.get('/profile', accessTokenValidator, wrapRequestHandler(getProfileController))
 
 /**
  * Description: Update my profile
@@ -79,7 +81,7 @@ customersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeControl
  * Header: {Authorization: Bearer <access_token>}
  * Body: CustomerSchema
  */
-customersRouter.patch('/me', accessTokenValidator, verifiedCustomerValidator, wrapRequestHandler(updatetMeController))
+customersRouter.patch('/profile', accessTokenValidator, wrapRequestHandler(updatetProfileController))
 
 /**
  * Description: Verify email when user client click on the link in email
@@ -158,13 +160,13 @@ customersRouter.get('/', wrapRequestHandler(getAllCustomersController))
  * Path: api/customers/:customer_id
  * Method: GET
  */
-customersRouter.get('/:customer_id', wrapRequestHandler(getAllCustomersController))
+customersRouter.get('/:customer_id', wrapRequestHandler(getCustomerByIdController))
 
 /**
- * Description: Get Customer by Id
- * Path: api/customers/:customer_id
+ * Description: Delete Customer by Id
+ * Path: api/customers/delete
  * Method: PUT
  */
-customersRouter.delete('/delete/:customer_id', wrapRequestHandler(deleteCustomerController))
+customersRouter.delete('/delete', wrapRequestHandler(deleteCustomerController))
 
 export default customersRouter

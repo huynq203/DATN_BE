@@ -9,6 +9,7 @@ export const getCartsByCustomerIdController = async (req: Request, res: Response
   const { customer_id } = req.decoded_authorization as TokenPayload
   const { status } = req.query
 
+
   const result = await cartsService.getCartsByCustomerId({ customer_id, status: Number(status) })
   if (result.total === 0) {
     res.json({

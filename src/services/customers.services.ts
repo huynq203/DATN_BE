@@ -2,7 +2,7 @@ import { hashPassword } from '~/utils/crypto'
 import databaseService from './database.services'
 import { TokenType, UserVerifyStatus } from '~/constants/enums'
 import { ObjectId } from 'mongodb'
-import { RegisterReqBody, UpdateMeRequestBody } from '~/models/requests/Customer.requests'
+import { RegisterReqBody, UpdateProfileRequestBody } from '~/models/requests/Customer.requests'
 import { signToken, verifyToken } from '~/utils/jwt'
 import dotenv from 'dotenv'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
@@ -12,6 +12,7 @@ import { CUSTOMERS_MESSAGES } from '~/constants/messages'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { ErrorWithStatus } from '~/models/Error'
 import axios from 'axios'
+import { verify } from 'crypto'
 dotenv.config()
 class CustomersService {
   //Khoi tao accesstoken
@@ -230,7 +231,7 @@ class CustomersService {
     // 3. Client send request to server with email_verify_token
     // 4. Server verify email_verify_token
     // 5. Client receive access_token and refresh_token
-    // await sendVerifyRegisterEmail(payload.email, email_verify_token)
+    await sendVerifyRegisterEmail(payload.email, email_verify_token)
 
     return {
       access_token,
@@ -264,10 +265,43 @@ class CustomersService {
         },
         {
           $lookup: {
-            from: 'carts',
+            from: 'addresses',
             localField: '_id',
             foreignField: 'customer_id',
-            as: 'cart'
+            as: 'addresses'
+          }
+        },
+        {
+          $project: {
+            name: 1,
+            email: 1,
+            phone: 1,
+            date_of_birth: 1,
+            addresses: 1,
+            verify: 1
+          }
+        }
+      ])
+      .toArray()
+    return {
+      access_token,
+      refresh_token,
+      // expires: process.env.ACCESS_TOKEN_EXPIRES_IN,
+      customer: customer[0],
+      role: 'customer'
+    }
+  }
+  //Dang xuat
+  async logout(refresh_token: string) {
+    await databaseService.refreshTokens.deleteOne({ token: refresh_token })
+  }
+
+  async getProfile(customer_id: string) {
+    const customer = await databaseService.customers
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(customer_id)
           }
         },
         {
@@ -278,57 +312,30 @@ class CustomersService {
             as: 'addresses'
           }
         },
-
         {
           $project: {
+            _id: 1,
             name: 1,
-            email: 1,
             phone: 1,
-            addresses: 1
+            date_of_birth: 1,
+            email: 1,
+            addresses: 1,
+            verify: 1
           }
         }
       ])
       .toArray()
-    return {
-      access_token,
-      refresh_token,
-      expires: process.env.ACCESS_TOKEN_EXPIRES_IN,
-      customer: customer[0]
-    }
-  }
-  //Dang xuat
-  async logout(refresh_token: string) {
-    await databaseService.refreshTokens.deleteOne({ token: refresh_token })
+    return customer[0]
   }
 
-  async getMe(customer_id: string) {
-    const customer = await databaseService.customers.findOne(
-      { _id: new ObjectId(customer_id) },
-      {
-        // projection filter
-        projection: {
-          password: 0,
-          email_verify_token: 0,
-          forgot_password_token: 0,
-          cart: 0,
-          created_at: 0,
-          updated_at: 0,
-          role: 0,
-          wishlist: 0
-        }
-      }
-    )
-    return customer
-  }
-
-  async updateMe(user_id: string, payload: UpdateMeRequestBody) {
+  async updateProfile(customer_id: string, payload: UpdateProfileRequestBody) {
     const customer = await databaseService.customers.findOneAndUpdate(
-      { _id: new ObjectId(user_id) },
+      { _id: new ObjectId(customer_id) },
       [
         //Sử dụng thời gian 2
         {
           $set: {
-            ...(payload as UpdateMeRequestBody),
+            ...(payload as UpdateProfileRequestBody),
             updated_at: '$$NOW'
           }
         }
@@ -446,6 +453,82 @@ class CustomersService {
         returnDocument: 'after'
       }
     )
+  }
+
+  async getAllCustomers() {
+    const result = await databaseService.customers
+      .aggregate([
+        {
+          $lookup: {
+            from: 'addresses',
+            localField: '_id',
+            foreignField: 'customer_id',
+            as: 'addresses'
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            email: 1,
+            phone: 1,
+            date_of_birth: 1,
+            addresses: 1,
+            status: 1,
+            verify: 1,
+            created_at: 1,
+            updated_at: 1
+          }
+        }
+      ])
+      .toArray()
+    return result
+  }
+  async getCustomerById(customer_id: string) {
+    const result = await databaseService.customers
+      .aggregate([
+        {
+          $match: {
+            _id: new ObjectId(customer_id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'addresses',
+            localField: '_id',
+            foreignField: 'customer_id',
+            as: 'addresses'
+          }
+        },
+        {
+          $lookup: {
+            from: 'wishlists',
+            localField: '_id',
+            foreignField: 'customer_id',
+            as: 'wishlists'
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            email: 1,
+            phone: 1,
+            date_of_birth: 1,
+            addresses: 1,
+            wishlists: 1,
+            status: 1,
+            verify: 1,
+            created_at: 1,
+            updated_at: 1
+          }
+        }
+      ])
+      .toArray()
+    return result[0]
+  }
+  async deleteCustomer(customer_id: string) {
+    await databaseService.customers.deleteOne({ _id: new ObjectId(customer_id) })
   }
 }
 const customersService = new CustomersService()

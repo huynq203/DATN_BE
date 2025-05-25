@@ -46,8 +46,8 @@ categoriesRouter.post(
  * Body: {name:string,description:string}
  * Header: {Authorization: Bearer <access_token>}
  */
-categoriesRouter.patch(
-  '/edit/:product_id',
+categoriesRouter.put(
+  '/update',
   accessTokenValidator,
   updateCategoryValidator,
   wrapRequestHandler(updateCategoryController)
@@ -60,6 +60,6 @@ categoriesRouter.patch(
  * Body: {_id:string,name:string,description:string,created_by}
  * Header: {Authorization: Bearer <access_token>}
  */
-categoriesRouter.delete('/delete/:product_id', accessTokenValidator, wrapRequestHandler(deleteCategoryController))
+categoriesRouter.delete('/delete', accessTokenValidator, wrapRequestHandler(deleteCategoryController))
 
 export default categoriesRouter

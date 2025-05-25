@@ -65,7 +65,12 @@ export const CUSTOMERS_MESSAGES = {
   CHANGE_PASSWORD_SUCCESS: 'Đổi mật khẩu thành công',
   GET_ME_SUCCESS: 'Thông tin tài khoản thành công',
   GMAIL_NOT_VERIFIED: 'Email chưa được xác thực',
-  EMAIL_NOT_FOUND: 'Email không tồn tại'
+  EMAIL_NOT_FOUND: 'Email không tồn tại',
+  GET_ALL_CUSTOMERS_SUCCESS: 'Lấy danh sách người dùng thành công',
+  GET_CUSTOMER_BY_ID_SUCCESS: 'Lấy thông tin người dùng thành công',
+  USER_NOT_FOUND: 'Người dùng không tồn tại',
+  UPDATE_CUSTOMER_SUCCESS: 'Cập nhật thông tin người dùng thành công',
+  DELETE_CUSTOMER_SUCCESS: 'Xóa người dùng thành công'
 } as const
 
 export const USERS_MESSAGES = {
@@ -89,7 +94,8 @@ export const ADDRESSES_MESSAGES = {
   UPDATE_SUCCESS: 'Cập nhật địa chỉ thành công',
   DELETE_SUCCESS: 'Xóa địa chỉ thành công',
   ADDRESS_NOT_FOUND: 'Địa chỉ không tồn tại',
-  ADDRESS_IS_REQUIRED: 'Địa chỉ không để trống'
+  ADDRESS_IS_REQUIRED: 'Địa chỉ không để trống',
+  GET_ADDRESS_SUCCESS: 'Lấy địa chỉ thành công'
 } as const
 
 export const CATEGORIES_MESSAGES = {
@@ -121,7 +127,13 @@ export const PRODUCTS_MESSAGES = {
   PRODUCT_NOT_FOUND: 'Sản phẩm không tồn tại',
   GET_PRODUCT_SUCCESS: 'Lấy sản phẩm thành công',
   CREATE_SIZE_SUCCESS: 'Tạo kích thước thành công',
-  CREATE_COLOR_SUCCESS: 'Tạo màu sắc thành công'
+  CREATE_COLOR_SUCCESS: 'Tạo màu sắc thành công',
+  GET_OPTION_PRODUCT_SUCCESS: 'Lấy tùy chọn sản phẩm thành công',
+  CREATE_OPTION_PRODUCT_SUCCESS: 'Tạo tùy chọn sản phẩm thành công',
+  UPDATE_OPTION_PRODUCT_SUCCESS: 'Cập nhật tùy chọn sản phẩm thành công',
+  DELETE_OPTION_PRODUCT_SUCCESS: 'Xóa tùy chọn sản phẩm thành công',
+  EXPORT_FILE_SUCCESS: 'Xuất file thành công',
+  OPTION_PRODUCT_EXISTS: 'Tùy chọn sản phẩm đã tồn tại'
 }
 
 export const MEDIA_MESSAGES = {
