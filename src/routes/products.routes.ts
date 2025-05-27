@@ -4,7 +4,7 @@ import {
   createProductController,
   deleteOptionProductController,
   deleteProductController,
-  exportFileController,
+  exportFileProductController,
   getAllProductController,
   getAllProductManagerController,
   getOptionProductController,
@@ -38,7 +38,7 @@ productsRouter.get('/manager', wrapRequestHandler(getAllProductManagerController
  * Path: api/products/export-file
  * Method: GET
  */
-productsRouter.get('/export-file', accessTokenValidator, wrapRequestHandler(exportFileController))
+productsRouter.get('/export-file', accessTokenValidator, wrapRequestHandler(exportFileProductController))
 
 /**
  * Description: get product by id

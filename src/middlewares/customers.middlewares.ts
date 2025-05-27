@@ -11,7 +11,7 @@ import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
 import { confirmPasswordSchema, dateOfBirthSchema, nameSchema, passwordSchema } from './commons.middlewares'
-import { UserVerifyStatus } from '~/constants/enums'
+import { StatusType, UserVerifyStatus } from '~/constants/enums'
 import { TokenPayload } from '~/models/requests/Customer.requests'
 import { ObjectId } from 'mongodb'
 
@@ -174,6 +174,9 @@ export const loginValidator = validate(
             })
             if (customer === null) {
               throw new Error(COMMONS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
+            }
+            if (customer.status === StatusType.Inactive) {
+              throw new Error(CUSTOMERS_MESSAGES.CUSTOMER_IS_LOCKED)
             }
             //Truyen req.user sang controller
             req.customer = customer

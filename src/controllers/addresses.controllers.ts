@@ -5,14 +5,26 @@ import { CreateAddressReqBody } from '~/models/requests/Address.requests'
 import { TokenPayload } from '~/models/requests/Customer.requests'
 import addressesService from '~/services/addresses.services'
 
-export const getAddressController = async (req: Request, res: Response, next: NextFunction) => {
-  const { customer_id } = req.decoded_authorization as TokenPayload
-  const result = await addressesService.getAddressByCustomerId(customer_id)
+export const getAllAddressController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await addressesService.getAllAddress()
   res.json({
     message: ADDRESSES_MESSAGES.GET_ADDRESS_SUCCESS,
     result
   })
   return
+}
+export const getAddressByCustomer = async (req: Request, res: Response, next: NextFunction) => {
+  const { customer_id } = req.params
+  const result = await addressesService.getAddressbyCustomer(customer_id)
+  res.json({
+    message: ADDRESSES_MESSAGES.GET_ADDRESS_SUCCESS,
+    result
+  })
+}
+
+export const getAddressCustomerManager = async (req: Request, res: Response, next: NextFunction) => {
+  const { customer_id } = req.params
+  console.log(customer_id)
 }
 
 export const createAddressController = async (
@@ -51,3 +63,5 @@ export const deleteAddressController = async (
   })
   return
 }
+
+

@@ -6,7 +6,15 @@ import roleService from '~/services/roles.services'
 import dotenv from 'dotenv'
 dotenv.config()
 
-export const getAllRoleController = async (req: Request, res: Response, next: NextFunction) => {}
+export const getAllRoleController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await roleService.getAllRole()
+  res.json({
+    message: ROLES_MESSAGES.GET_ALL_ROLE,
+    result
+  })
+  return
+}
+
 export const getRolebyIdController = async (req: Request, res: Response, next: NextFunction) => {}
 
 export const createRoleController = async (

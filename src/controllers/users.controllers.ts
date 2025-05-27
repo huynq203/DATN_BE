@@ -3,6 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import dotenv from 'dotenv'
 import { COMMONS_MESSAGES, USERS_MESSAGES } from '~/constants/messages'
 import {
+  ChangeStatusUserReqBody,
   CreateUserReqBody,
   DeleteUserReqBody,
   LoginUserReqBody,
@@ -52,14 +53,45 @@ export const getMeUserController = async (req: Request, res: Response, next: Nex
   return
 }
 
+export const getAllUsersController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await usersService.getAllUsers()
+  res.json({
+    message: USERS_MESSAGES.GET_ALL_USERS_SUCCESS,
+    result
+  })
+}
+
+export const changeStatusUserController = async (
+  req: Request<ParamsDictionary, any, ChangeStatusUserReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { user_id_change, status } = req.body
+  await usersService.changeStatusUser({
+    user_id,
+    user_id_change,
+    status
+  })
+  res.json({
+    message: USERS_MESSAGES.CHANGE_STATUS_SUCCESS
+  })
+}
+
+export const getUserByIdController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id_change } = req.params
+  console.log(user_id_change)
+}
+
 export const createUserController = async (
   req: Request<ParamsDictionary, any, CreateUserReqBody>,
   res: Response,
   next: NextFunction
 ) => {
-  const { role } = req.decoded_authorization as TokenPayload
-  const result = await usersService.createUser({ payload: req.body, role_id: role })
+  const { user_id, role } = req.decoded_authorization as TokenPayload
+  const result = await usersService.createUser({ user_id, role_id: role, payload: req.body })
   res.json({
+    message: USERS_MESSAGES.CREATE_SUCCESS,
     result
   })
   return
@@ -70,8 +102,16 @@ export const updateUserController = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { user_id, role } = req.decoded_authorization as TokenPayload
+  const result = await usersService.updateUser({
+    user_id,
+    role_id: role,
+    payload: req.body
+  })
+
   res.json({
-    message: USERS_MESSAGES.UPDATE_PROFILE_SUCCESS
+    message: USERS_MESSAGES.UPDATE_PROFILE_SUCCESS,
+    result
   })
   return
 }

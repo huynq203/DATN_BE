@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import {
   ChangePasswordReqBody,
+  ChangeStatusReqBody,
   ForgotPasswordReqBody,
   LoginReqBody,
   LogoutReqBody,
@@ -15,7 +16,7 @@ import {
 import { ObjectId } from 'mongodb'
 import databaseService from '~/services/database.services'
 import HTTP_STATUS from '~/constants/httpStatus'
-import { UserVerifyStatus } from '~/constants/enums'
+import { StatusType, UserVerifyStatus } from '~/constants/enums'
 import customersService from '~/services/customers.services'
 import { COMMONS_MESSAGES, CUSTOMERS_MESSAGES } from '~/constants/messages'
 import Customer from '~/models/schemas/Customer.schemas'
@@ -40,7 +41,6 @@ export const getCustomerByIdController = async (req: Request, res: Response, nex
     result
   })
 }
-export const updateCustomerController = async (req: Request, res: Response, next: NextFunction) => {}
 export const deleteCustomerController = async (req: Request, res: Response, next: NextFunction) => {
   const { customer_id } = req.body
   await customersService.deleteCustomer(customer_id)
@@ -228,4 +228,27 @@ export const changePasswordController = async (
     message: CUSTOMERS_MESSAGES.CHANGE_PASSWORD_SUCCESS
   })
   return
+}
+
+export const changeStatusController = async (
+  req: Request<ParamsDictionary, any, ChangeStatusReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { customer_id } = req.body
+  const { status } = req.body
+  await customersService.changeStatus({ user_id, customer_id, status })
+
+  res.json({
+    message: CUSTOMERS_MESSAGES.CHANGE_STATUS_SUCCESS
+  })
+}
+
+export const exportFileCustomerController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await customersService.exportFileCustomer({ req, res })
+  res.json({
+    message: CUSTOMERS_MESSAGES.EXPORT_FILE_CUSTOMER_SUCCESS,
+    result
+  })
 }

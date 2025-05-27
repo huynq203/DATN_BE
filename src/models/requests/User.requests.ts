@@ -1,13 +1,12 @@
+import { StatusType } from '~/constants/enums'
+
 export interface CreateUserReqBody {
   name: string
   email: string
   phone: string
   date_of_birth: Date
   address: string
-  role: string
-  created_by: string
-  password: string
-  confirm_password: string
+  role_id: string
 }
 export interface LoginUserReqBody {
   email: string
@@ -19,14 +18,20 @@ export interface LogoutUserResBody {
 }
 
 export interface UpdateUserReqBody {
-  user_id: string
+  user_id_change: string
   name?: string
   email?: string
   phone?: string
   date_of_birth?: Date
   address?: string
+  role_id?: string
 }
 
 export interface DeleteUserReqBody {
   user_id: string
+}
+
+export interface ChangeStatusUserReqBody {
+  user_id_change: string
+  status: StatusType
 }

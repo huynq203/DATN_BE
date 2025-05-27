@@ -1,5 +1,5 @@
 import { JwtPayload } from 'jsonwebtoken'
-import { TokenType } from '~/constants/enums'
+import { StatusType, TokenType } from '~/constants/enums'
 
 export interface TokenPayload extends JwtPayload {
   user_id: string
@@ -53,4 +53,9 @@ export interface ChangePasswordReqBody {
   old_password: string
   new_password: string
   confirm_new_password: string
+}
+
+export interface ChangeStatusReqBody {
+  customer_id: string
+  status: StatusType
 }

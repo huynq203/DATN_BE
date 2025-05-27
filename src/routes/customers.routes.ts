@@ -2,7 +2,9 @@ import { Router } from 'express'
 const customersRouter = Router()
 import {
   changePasswordController,
+  changeStatusController,
   deleteCustomerController,
+  exportFileCustomerController,
   forgotPasswordController,
   getAllCustomersController,
   getCustomerByIdController,
@@ -13,7 +15,6 @@ import {
   registerController,
   resendVerifyEmailController,
   resetPasswordController,
-  updateCustomerController,
   updatetProfileController,
   verifyEmailController,
   verifyForgotPasswordController
@@ -149,6 +150,13 @@ customersRouter.put(
 )
 
 /**
+ * Description: Export File
+ * Path: api/customers/export-file
+ * Method: PUT
+ */
+customersRouter.get('/export-file', wrapRequestHandler(exportFileCustomerController))
+
+/**
  * Description: Get all Customer
  * Path: api/customers/
  * Method: GET
@@ -168,5 +176,12 @@ customersRouter.get('/:customer_id', wrapRequestHandler(getCustomerByIdControlle
  * Method: PUT
  */
 customersRouter.delete('/delete', wrapRequestHandler(deleteCustomerController))
+
+/**
+ * Description: Change Status by Id
+ * Path: api/customers/change-status
+ * Method: PUT
+ */
+customersRouter.patch('/change-status', wrapRequestHandler(changeStatusController))
 
 export default customersRouter

@@ -2,20 +2,37 @@ import { Router } from 'express'
 import {
   createAddressController,
   deleteAddressController,
-  getAddressController,
+  getAddressByCustomer,
+  getAllAddressController,
   updateAddressController
 } from '~/controllers/addresses.controllers'
 import { accessTokenValidator } from '~/middlewares/commons.middlewares'
 import { wrapRequestHandler } from '~/utils/hanlders'
 const addressesRouter = Router()
 
+// /**
+//  * Description: Get all address
+//  * Path: /addresses/
+//  * Method: GET
+//  * Headers: {Authorization: Bearer <access_token>}
+//  */
+addressesRouter.get('/', accessTokenValidator, wrapRequestHandler(getAllAddressController))
+
 /**
- * Description: Gett address
- * Path: /
+ * Description: Get address by Customer
+ * Path: /addresses/address-by-customer
  * Method: GET
  * Headers: {Authorization: Bearer <access_token>}
  */
-addressesRouter.get('/', accessTokenValidator, wrapRequestHandler(getAddressController))
+addressesRouter.get('/address-by-customer', accessTokenValidator, wrapRequestHandler(getAddressByCustomer))
+
+/**
+ * Description: Get address by ID
+ * Path: /addresses/:address_id
+ * Method: GET
+ * Headers: {Authorization: Bearer <access_token>}
+ */
+addressesRouter.get('/:customer_id', accessTokenValidator, wrapRequestHandler(getAddressByCustomer))
 
 /**
  * Description: Create a new address
@@ -33,7 +50,7 @@ addressesRouter.post('/create', accessTokenValidator, wrapRequestHandler(createA
  * Body: {name:string,description:string}
  * Headers: {Authorization: Bearer <access_token>}
  */
-addressesRouter.put('/edit/:id', accessTokenValidator, wrapRequestHandler(updateAddressController))
+addressesRouter.put('/update', accessTokenValidator, wrapRequestHandler(updateAddressController))
 
 /**
  * Description: Delete a address
@@ -42,6 +59,6 @@ addressesRouter.put('/edit/:id', accessTokenValidator, wrapRequestHandler(update
  * Body: {name:string,description:string}
  * Headers: {Authorization: Bearer <access_token>}
  */
-addressesRouter.delete('/delete/:id', accessTokenValidator, wrapRequestHandler(deleteAddressController))
+addressesRouter.delete('/delete', accessTokenValidator, wrapRequestHandler(deleteAddressController))
 
 export default addressesRouter

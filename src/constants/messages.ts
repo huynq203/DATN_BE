@@ -34,7 +34,8 @@ export const COMMONS_MESSAGES = {
   PASS_IS_INCORRECT: 'Mật khẩu không đúng',
   EMAIL_OR_PASSWORD_IS_INCORRECT: 'Email hoặc mật khẩu không đúng',
   LOGIN_SUCCESS: 'Đăng nhập thành công',
-  LOGOUT_SUCCESS: 'Đăng xuất thành công'
+  LOGOUT_SUCCESS: 'Đăng xuất thành công',
+  USER_IS_LOCKED: 'Tài khoản đã bị khóa, Yêu cầu liên hệ admin để mở tài khoản'
 } as const
 
 export const CUSTOMERS_MESSAGES = {
@@ -70,14 +71,20 @@ export const CUSTOMERS_MESSAGES = {
   GET_CUSTOMER_BY_ID_SUCCESS: 'Lấy thông tin người dùng thành công',
   USER_NOT_FOUND: 'Người dùng không tồn tại',
   UPDATE_CUSTOMER_SUCCESS: 'Cập nhật thông tin người dùng thành công',
-  DELETE_CUSTOMER_SUCCESS: 'Xóa người dùng thành công'
+  DELETE_CUSTOMER_SUCCESS: 'Xóa người dùng thành công',
+  CUSTOMER_IS_LOCKED: 'Tài khoản đã bị khóa, Yêu cầu liên hệ admin để mở tài khoản',
+  CHANGE_STATUS_SUCCESS: 'Thay đổi trạng thái người dùng thành công',
+  EXPORT_FILE_CUSTOMER_SUCCESS: 'Xuất file người dùng thành công'
 } as const
 
 export const USERS_MESSAGES = {
+  GET_ALL_USERS_SUCCESS: 'Lấy danh sách người dùng thành công',
+  GET_USER_BY_ID_SUCCESS: 'Lấy thông tin người dùng thành công',
   CREATE_SUCCESS: 'Tạo người dùng thành công',
   UPDATE_PROFILE_SUCCESS: 'Cập nhật thông tin thành công',
   DELETE_SUCCESS: 'Xóa người dùng thành công',
-  YOU_NOT_HAVE_PERMISSION: 'Bạn không có quyền thực hiện hành động này'
+  YOU_NOT_HAVE_PERMISSION: 'Bạn không có quyền thực hiện hành động này',
+  CHANGE_STATUS_SUCCESS: 'Thay đổi trạng thái người dùng thành công'
 } as const
 
 export const ROLES_MESSAGES = {
@@ -86,7 +93,8 @@ export const ROLES_MESSAGES = {
   DELETE_SUCCESS: 'Xóa vai trò thành công',
   ROLENAME_IS_REQUIRED: 'Vai trò không để trống',
   ROLENAME_MUST_BE_A_STRING: 'Vai trò phải là một chuỗi',
-  DESCRIPTION_IS_REQUIRED: 'Mô tả không để trống'
+  DESCRIPTION_IS_REQUIRED: 'Mô tả không để trống',
+  GET_ALL_ROLE: 'Lấy danh sách vai trò thành công'
 } as const
 
 export const ADDRESSES_MESSAGES = {

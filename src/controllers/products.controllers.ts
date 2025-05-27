@@ -173,7 +173,7 @@ export const deleteOptionProductController = async (req: Request, res: Response,
   })
 }
 
-export const exportFileController = async (req: Request, res: Response, next: NextFunction) => {
+export const exportFileProductController = async (req: Request, res: Response, next: NextFunction) => {
   const result = await productsService.exportFile({ req, res })
   res.json({
     message: PRODUCTS_MESSAGES.EXPORT_FILE_SUCCESS,

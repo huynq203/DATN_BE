@@ -5,6 +5,7 @@ import { confirmPasswordSchema, dateOfBirthSchema, nameSchema, passwordSchema } 
 import usersService from '~/services/users.services'
 import databaseService from '~/services/database.services'
 import { hashPassword } from '~/utils/crypto'
+import { StatusType } from '~/constants/enums'
 
 export const loginUserValidator = validate(
   checkSchema(
@@ -23,6 +24,9 @@ export const loginUserValidator = validate(
 
             if (user === null) {
               throw new Error(COMMONS_MESSAGES.EMAIL_OR_PASSWORD_IS_INCORRECT)
+            }
+            if (user.status === StatusType.Inactive) {
+              throw new Error(COMMONS_MESSAGES.USER_IS_LOCKED)
             }
             //Truyen req.user sang controller
             req.user = user
@@ -86,9 +90,7 @@ export const createUserValidator = validate(
           }
         }
       },
-      date_of_birth: dateOfBirthSchema,
-      password: passwordSchema,
-      confirm_password: confirmPasswordSchema
+      date_of_birth: dateOfBirthSchema
     },
     ['body']
   )

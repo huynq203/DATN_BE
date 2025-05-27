@@ -1,6 +1,6 @@
 import { hashPassword } from '~/utils/crypto'
 import databaseService from './database.services'
-import { TokenType, UserVerifyStatus } from '~/constants/enums'
+import { StatusType, TokenType, UserVerifyStatus } from '~/constants/enums'
 import { ObjectId } from 'mongodb'
 import { RegisterReqBody, UpdateProfileRequestBody } from '~/models/requests/Customer.requests'
 import { signToken, verifyToken } from '~/utils/jwt'
@@ -12,7 +12,8 @@ import { CUSTOMERS_MESSAGES } from '~/constants/messages'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { ErrorWithStatus } from '~/models/Error'
 import axios from 'axios'
-import { verify } from 'crypto'
+import { Request, Response } from 'express'
+import ExcelJS from 'exceljs'
 dotenv.config()
 class CustomersService {
   //Khoi tao accesstoken
@@ -529,6 +530,86 @@ class CustomersService {
   }
   async deleteCustomer(customer_id: string) {
     await databaseService.customers.deleteOne({ _id: new ObjectId(customer_id) })
+  }
+  async changeStatus({ user_id, customer_id, status }: { user_id: string; customer_id: string; status: StatusType }) {
+    if (status === StatusType.Active) {
+      await databaseService.customers.updateOne(
+        {
+          _id: new ObjectId(customer_id)
+        },
+        [
+          {
+            $set: {
+              status: StatusType.Inactive,
+              created_by: new ObjectId(user_id),
+              updated_at: '$$NOW'
+            }
+          }
+        ]
+      )
+    } else {
+      await databaseService.customers.updateOne(
+        {
+          _id: new ObjectId(customer_id)
+        },
+        [
+          {
+            $set: {
+              status: StatusType.Active,
+              created_by: new ObjectId(user_id),
+              updated_at: '$$NOW'
+            }
+          }
+        ]
+      )
+    }
+  }
+  async exportFileCustomer({ req, res }: { req: Request; res: Response }) {
+    const customers = await databaseService.customers
+      .aggregate([
+        {
+          $lookup: {
+            from: 'addresses',
+            localField: '_id',
+            foreignField: 'customer_id',
+            as: 'addresses'
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            email: 1,
+            phone: 1,
+            date_of_birth: 1,
+            addresses: 1,
+            status: 1,
+            verify: 1,
+            created_at: 1,
+            updated_at: 1
+          }
+        }
+      ])
+      .toArray()
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Customers')
+    worksheet.columns = [
+      { header: 'ID', key: '_id', width: 36 },
+      { header: 'Name', key: 'name', width: 20 },
+      { header: 'Email', key: 'email', width: 30 },
+      { header: 'Phone', key: 'phone', width: 15 },
+      { header: 'Date of Birth', key: 'date_of_birth', width: 15 },
+      { header: 'Status', key: 'status', width: 15 },
+      { header: 'Verify', key: 'verify', width: 15 },
+      { header: 'Created At', key: 'created_at', width: 20 },
+      { header: 'Updated At', key: 'updated_at', width: 20 }
+    ]
+    customers.forEach((item) => {
+      worksheet.addRow(item)
+    })
+    const result = await workbook.xlsx.write(res)
+    res.end()
+    return result
   }
 }
 const customersService = new CustomersService()

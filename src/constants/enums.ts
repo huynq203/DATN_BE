@@ -17,8 +17,8 @@ export enum ProductStatus {
 }
 
 export enum RoleType {
-  Admin = 'admin',
-  Staff = 'staff'
+  ADMIN = 'admin',
+  STAFF = 'staff'
 }
 export enum MediaType {
   Image, // 0

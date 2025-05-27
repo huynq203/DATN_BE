@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb'
+import { StatusType } from '~/constants/enums'
 
 interface UserType {
   _id?: ObjectId
@@ -9,6 +10,7 @@ interface UserType {
   date_of_birth: Date
   address: string
   role: ObjectId
+  status?: StatusType
   created_by: ObjectId
   created_at?: Date
   updated_at?: Date
@@ -23,7 +25,8 @@ export default class User {
   date_of_birth: Date
   address: string
   role: ObjectId
-  created_by?: ObjectId
+  status: StatusType
+  created_by: ObjectId
   created_at: Date
   updated_at: Date
   constructor(user: UserType) {
@@ -36,6 +39,7 @@ export default class User {
     this.date_of_birth = user.date_of_birth
     this.address = user.address
     this.role = user.role
+    this.status = user.status || StatusType.Active
     this.created_by = user.created_by
     this.created_at = user.created_at || date
     this.updated_at = user.updated_at || date

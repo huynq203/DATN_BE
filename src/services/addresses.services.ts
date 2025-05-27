@@ -3,10 +3,80 @@ import databaseService from './database.services'
 import { ObjectId } from 'mongodb'
 
 class AddressesService {
-  async getAddressByCustomerId(customer_id: string) {
+  async getAllAddress() {
     const result = await databaseService.addresses
-      .find({ customer_id: new ObjectId(customer_id) })
-      .sort({ created_at: -1 })
+      .aggregate([
+        {
+          $lookup: {
+            from: 'customers',
+            localField: 'customer_id',
+            foreignField: '_id',
+            as: 'customer_id'
+          }
+        },
+        {
+          $unwind: {
+            path: '$customer_id'
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            phone: 1,
+            address: 1,
+            customer_id: {
+              _id: '$customer_id._id',
+              name: '$customer_id.name',
+              phone: '$customer_id.phone'
+            },
+            created_at: 1,
+            updated_at: 1
+          }
+        }
+      ])
+      .toArray()
+    console.log(result)
+
+    return result
+  }
+  async getAddressbyCustomer(customer_id: string) {
+    const result = await databaseService.addresses
+      .aggregate([
+        {
+          $match: {
+            customer_id: new ObjectId(customer_id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'customers',
+            localField: 'customer_id',
+            foreignField: '_id',
+            as: 'customer_id'
+          }
+        },
+        {
+          $unwind: {
+            path: '$customer_id'
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            phone: 1,
+            address: 1,
+            customer_id: {
+              _id: '$customer_id._id',
+              name: '$customer_id.name',
+              phone: '$customer_id.phone'
+            },
+            created_at: 1,
+            updated_at: 1
+          }
+        }
+      ])
       .toArray()
     return result
   }
