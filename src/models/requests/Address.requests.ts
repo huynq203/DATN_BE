@@ -4,4 +4,9 @@ export interface CreateAddressReqBody {
   address: string
 }
 
-
+export interface UpdateAddressReqBody {
+  address_id: string
+  name: string
+  phone: string
+  address: string
+}

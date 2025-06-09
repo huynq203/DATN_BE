@@ -1,9 +1,11 @@
 import { Router } from 'express'
 const usersRouter = Router()
 import {
+  changePasswordUserController,
   changeStatusUserController,
   createUserController,
   deleteUserController,
+  exportFileUserController,
   getAllUsersController,
   getMeUserController,
   getUserByIdController,
@@ -12,7 +14,7 @@ import {
   updateUserController
 } from '~/controllers/users.controllers'
 import { accessTokenValidator, refreshTokenValidator } from '~/middlewares/commons.middlewares'
-import { createUserValidator, loginUserValidator } from '~/middlewares/users.middlewares'
+import { changePasswordValidatorUser, createUserValidator, loginUserValidator } from '~/middlewares/users.middlewares'
 import { wrapRequestHandler } from '~/utils/hanlders'
 
 /**
@@ -39,6 +41,29 @@ usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, wrapReq
  * Header: {Authorization: Bearer <access_token>}
  */
 usersRouter.get('/me', accessTokenValidator, wrapRequestHandler(getMeUserController))
+
+/**
+ * Description: Change Password
+ * Path: /change-password
+ * Method: PUT
+ * Body: {ole_password:string,new_password:string,confirm_new_password:string}
+ * Header: {Authorization: Bearer <access_token>}
+ */
+usersRouter.put(
+  '/change-password',
+  accessTokenValidator,
+  changePasswordValidatorUser,
+  wrapRequestHandler(changePasswordUserController)
+)
+
+/**
+ * Description: Delete a user
+ * Path: /delete
+ * Method: DELETE
+ * Body: {user_id:string}
+ * Header: {Authorization: Bearer <access_token>}
+ */
+usersRouter.post('/export-file', accessTokenValidator, wrapRequestHandler(exportFileUserController))
 
 /**
  * Description: Get all users

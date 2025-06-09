@@ -9,6 +9,26 @@ import { VnPayStatus } from '~/constants/enums'
 
 config()
 
+export const getOrderByCustomerController = async (req: Request, res: Response, next: NextFunction) => {
+  const { customer_id } = req.decoded_authorization as TokenPayload
+
+  await ordersService.getOrderByCustomer(customer_id)
+  res.json({
+    message: ORDERS_MESSAGES.GET_ORDERS_SUCCESS
+  })
+  return
+}
+
+export const getOrderManager = async (req: Request, res: Response, next: NextFunction) => {
+  const key_search = req.query.key_search as string
+  const result = await ordersService.getOrderManager({ key_search })
+  res.json({
+    message: ORDERS_MESSAGES.GET_ORDERS_SUCCESS,
+    result
+  })
+  return
+}
+
 export const orderCodController = async (
   req: Request<ParamsDictionary, any, OrderReqBody>,
   res: Response,

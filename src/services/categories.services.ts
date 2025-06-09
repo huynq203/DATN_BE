@@ -6,7 +6,7 @@ import { ObjectId } from 'mongodb'
 class CategoriesSerice {
   async getAllCategories() {
     // const categories = await databaseService.categories.find().sort({ created_at: -1 }).toArray()
-    const categories = await databaseService.categories
+    const result = await databaseService.categories
       .aggregate([
         {
           $lookup: {
@@ -36,7 +36,46 @@ class CategoriesSerice {
         }
       ])
       .toArray()
-    return categories
+    return result
+  }
+  async getAllCategoriesManager({ key_search }: { key_search?: string }) {
+    const filterKeySearch = key_search
+      ? {
+          $or: [{ name: { $regex: key_search, $options: 'i' } }, { description: { $regex: key_search, $options: 'i' } }]
+        }
+      : {}
+    const result = await databaseService.categories
+      .aggregate([
+        ...(filterKeySearch ? [{ $match: filterKeySearch }] : []),
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'created_by',
+            foreignField: '_id',
+            as: 'created_by'
+          }
+        },
+        { $unwind: '$created_by' },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            description: 1,
+            slug: 1,
+            created_at: 1,
+            updated_at: 1,
+            created_by: {
+              _id: '$created_by._id',
+              name: '$created_by.name'
+            }
+          }
+        },
+        {
+          $sort: { created_at: -1 }
+        }
+      ])
+      .toArray()
+    return result
   }
   async getCategoryById(category_id: string) {
     const category = await databaseService.categories.findOne({

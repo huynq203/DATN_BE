@@ -6,6 +6,8 @@ export interface OrderReqBody {
   phone: string
   address: string
   total_price: string
+  discount_price?: number
+  code_voucher?: string
   payment_method: PaymentMethod
   payment_status?: PaymentStatus
   order_details: {
@@ -14,6 +16,7 @@ export interface OrderReqBody {
     quantity: number
     size: number
     color: string
+    cost_price: number
   }[]
 }
 

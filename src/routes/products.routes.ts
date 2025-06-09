@@ -1,5 +1,7 @@
 import { Router } from 'express'
 import {
+  changeStatusOptionProductController,
+  changeStatusProductController,
   createOptionProductController,
   createProductController,
   deleteOptionProductController,
@@ -7,12 +9,13 @@ import {
   exportFileProductController,
   getAllProductController,
   getAllProductManagerController,
+  getAllStockOptionProductManagerByIdController,
   getOptionProductController,
   getProductByIdController,
   updateOptionProductController,
   updateProductController,
-  uploadImageByProductController,
-  uploadImageProductController
+  uploadImageProductController,
+  uploadImageVariantColorController
 } from '~/controllers/products.controllers'
 import { accessTokenValidator, isLoggedInVaidator } from '~/middlewares/commons.middlewares'
 import { createProductValidator, updateProductValidator } from '~/middlewares/products.middlewares'
@@ -38,7 +41,26 @@ productsRouter.get('/manager', wrapRequestHandler(getAllProductManagerController
  * Path: api/products/export-file
  * Method: GET
  */
-productsRouter.get('/export-file', accessTokenValidator, wrapRequestHandler(exportFileProductController))
+productsRouter.post('/export-file', accessTokenValidator, wrapRequestHandler(exportFileProductController))
+
+/**
+ * Description: get Stock Products for Manager
+ * Path: api/products/check-stock-option-product
+ * Method: GET
+ */
+productsRouter.get(
+  '/check-stock-option-product/:option_product_id',
+  wrapRequestHandler(getAllStockOptionProductManagerByIdController)
+)
+
+/**
+ * Description: GET Option Products by product_id
+ * Path: api/products/get-option-products/:product_id
+ * Method: GET
+ * Body: {product_id:string}
+ * Header: {Authorization: Bearer <access_token>}
+ */
+productsRouter.get('/get-option-products/:product_id', wrapRequestHandler(getOptionProductController))
 
 /**
  * Description: get product by id
@@ -90,21 +112,18 @@ productsRouter.delete('/delete', accessTokenValidator, wrapRequestHandler(delete
  */
 productsRouter.post('/upload-image', accessTokenValidator, wrapRequestHandler(uploadImageProductController))
 
-// //Upload file
-productsRouter.post(
-  '/upload-image/:product_id',
-  accessTokenValidator,
-  wrapRequestHandler(uploadImageByProductController)
-)
-
 /**
- * Description: GET Option Products by product_id
- * Path: api/products/get-option-products/:product_id
- * Method: GET
- * Body: {product_id:string}
+ * Description: Upload Image Variant Color Product
+ * Path: api/products/upload-image
+ * Method: POST
+ * Body: rest of the body is form-data with key 'file' and value is the image file
  * Header: {Authorization: Bearer <access_token>}
  */
-productsRouter.get('/get-option-products/:product_id', wrapRequestHandler(getOptionProductController))
+productsRouter.post(
+  '/upload-image-variant-color',
+  accessTokenValidator,
+  wrapRequestHandler(uploadImageVariantColorController)
+)
 
 /**
  * Description: Create Option Products by product_id
@@ -113,7 +132,7 @@ productsRouter.get('/get-option-products/:product_id', wrapRequestHandler(getOpt
  * Body: {product_id:string, stock:number, sizes:number, colors:string}
  * Header: {Authorization: Bearer <access_token>}
  */
-productsRouter.post('/create-option-product/', accessTokenValidator, wrapRequestHandler(createOptionProductController))
+productsRouter.post('/create-option-product', accessTokenValidator, wrapRequestHandler(createOptionProductController))
 
 /**
  * Description: Update Option Products by product_id
@@ -132,5 +151,29 @@ productsRouter.put('/update-option-product', accessTokenValidator, wrapRequestHa
  * Header: {Authorization: Bearer <access_token>}
  */
 productsRouter.delete('/delete-option-product', accessTokenValidator, wrapRequestHandler(deleteOptionProductController))
+
+/**
+ * Description: Cập nhật trạng thái sản phẩm
+ * Path: api/products/change-status
+ * Method: POST
+ * Body: {option_product_id:string}
+ * Header: {Authorization: Bearer <access_token>}
+ */
+productsRouter.patch('/change-status', accessTokenValidator, wrapRequestHandler(changeStatusProductController))
+
+/**
+ * Description: Cập nhật trạng thái sản phẩm thuộc tính
+ * Path: api/products/change-status
+ * Method: POST
+ * Body: {option_product_id:string}
+ * Header: {Authorization: Bearer <access_token>}
+ */
+productsRouter.patch(
+  '/change-status-option-product',
+  accessTokenValidator,
+  wrapRequestHandler(changeStatusOptionProductController)
+)
+
+
 
 export default productsRouter

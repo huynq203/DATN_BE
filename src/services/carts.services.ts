@@ -80,8 +80,6 @@ class CartsService {
     }
   }
   async addToCart({ customer_id, payload }: { customer_id: string; payload: CartReqBody }) {
-
-    
     const findCart = await databaseService.carts.findOne({
       customer_id: new ObjectId(customer_id),
       product_id: new ObjectId(payload.product_id),
@@ -95,7 +93,8 @@ class CartsService {
           customer_id: new ObjectId(customer_id),
           product_id: new ObjectId(payload.product_id),
           size: payload.size,
-          color: payload.color
+          color: payload.color,
+          cost_price: payload.cost_price
         },
         {
           $inc: {
@@ -126,7 +125,8 @@ class CartsService {
       customer_id: new ObjectId(customer_id),
       product_id: new ObjectId(payload.product_id),
       color: payload.color,
-      size: payload.size
+      size: payload.size,
+      cost_price: payload.cost_price
     })
     if (findCart) {
       const result = await databaseService.carts.findOneAndUpdate(

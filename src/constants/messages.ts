@@ -1,5 +1,3 @@
-import { DES } from 'crypto-js'
-
 export const JWT_MESSAGES = {
   JWT_EXPRIED: 'JWT hết hạn'
 } as const
@@ -18,11 +16,11 @@ export const COMMONS_MESSAGES = {
   PASSWORD_IS_REQUIRED: 'Mật khẩu không để trống',
   PASSWORD_MUST_BE_A_STRING: 'Mật khẩu phải là một chuỗi',
   PASSWORD_LENGHT_MUST_BE_FROM_6_to_50: 'Độ dài mật khẩu từ 6 đến 50 ký tự',
-  PASSWORD_MUST_BE_STRONG: 'Mật khẩu phải mạnh',
+  PASSWORD_MUST_BE_STRONG: 'Mật khẩu không hợp lệ',
   CONFIRM_PASSWORD_IS_REQUIRED: 'Mật khẩu xác nhận không để trống',
   CONFIRM_PASSWORD_MUST_BE_A_STRING: 'Mật khẩu xác nhận phải là một chuỗi',
   CONFRIM_PASSWORD_LENGTH_MUST_BE_FROM_6: 'Độ dài mật khẩu xác nhận từ 6 ký tự',
-  CONFIRM_PASSWORD_MUST_BE_STRONG: 'Mật khẩu xác nhận phải mạnh',
+  CONFIRM_PASSWORD_MUST_BE_STRONG: 'Mật khẩu xác nhận không hợp lệ',
   CONFIRM_PASSWORD_MUST_BE_THE_SAME_AS_PASSWORD: ' Mật khẩu xác nhận không khớp với mật khẩu',
   DATE_OF_BIRTH_MUST_BE_ISO8601: ' Ngày sinh không hợp lệ',
   EMAIL_IS_INVALID: 'Email không hợp lệ',
@@ -84,7 +82,18 @@ export const USERS_MESSAGES = {
   UPDATE_PROFILE_SUCCESS: 'Cập nhật thông tin thành công',
   DELETE_SUCCESS: 'Xóa người dùng thành công',
   YOU_NOT_HAVE_PERMISSION: 'Bạn không có quyền thực hiện hành động này',
-  CHANGE_STATUS_SUCCESS: 'Thay đổi trạng thái người dùng thành công'
+  CHANGE_STATUS_SUCCESS: 'Thay đổi trạng thái người dùng thành công',
+  CHANGE_PASSWORD_SUCCESS: 'Đổi mật khẩu thành công',
+  USER_NOT_FOUND: 'Người dùng không tồn tại',
+  OLD_PASSWORD_NOT_MATCH: 'Mật khẩu cũ không đúng',
+  PASSWORD_IS_REQUIRED: 'Mật khẩu không để trống',
+  PASSWORD_MUST_BE_A_STRING: 'Mật khẩu phải là một chuỗi',
+  PASSWORD_LENGHT_MUST_BE_FROM_6_to_50: 'Độ dài mật khẩu từ 6 đến 50 ký tự',
+  PASSWORD_NEW_MUST_BE_STRONG: 'Mật khẩu mới không hợp lệ',
+  CONFIRM_PASSWORD_IS_REQUIRED: 'Mật khẩu xác nhận không để trống',
+  CONFIRM_PASSWORD_MUST_BE_A_STRING: 'Mật khẩu xác nhận phải là một chuỗi',
+  CONFRIM_PASSWORD_LENGTH_MUST_BE_FROM_6_TO_50: 'Độ dài mật khẩu xác nhận từ 6 đến 50 ký tự',
+  CONFIRM_PASSWORD_MUST_BE_THE_SAME_AS_PASSWORD: 'Mật khẩu xác nhận không khớp với mật khẩu'
 } as const
 
 export const ROLES_MESSAGES = {
@@ -103,7 +112,8 @@ export const ADDRESSES_MESSAGES = {
   DELETE_SUCCESS: 'Xóa địa chỉ thành công',
   ADDRESS_NOT_FOUND: 'Địa chỉ không tồn tại',
   ADDRESS_IS_REQUIRED: 'Địa chỉ không để trống',
-  GET_ADDRESS_SUCCESS: 'Lấy địa chỉ thành công'
+  GET_ADDRESS_SUCCESS: 'Lấy địa chỉ thành công',
+  UPDATE_ADDRESS_DEFAULT_SUCCESS: 'Cập nhật địa chỉ mặc định thành công'
 } as const
 
 export const CATEGORIES_MESSAGES = {
@@ -141,7 +151,9 @@ export const PRODUCTS_MESSAGES = {
   UPDATE_OPTION_PRODUCT_SUCCESS: 'Cập nhật tùy chọn sản phẩm thành công',
   DELETE_OPTION_PRODUCT_SUCCESS: 'Xóa tùy chọn sản phẩm thành công',
   EXPORT_FILE_SUCCESS: 'Xuất file thành công',
-  OPTION_PRODUCT_EXISTS: 'Tùy chọn sản phẩm đã tồn tại'
+  OPTION_PRODUCT_EXISTS: 'Tùy chọn sản phẩm đã tồn tại',
+  CHANGE_STATUS_PRODUCT_SUCCESS: 'Thay đổi trạng thái sản phẩm thành công',
+  GET_PRODUCT_CHECK_STOCK_SUCCESS: 'Lấy sản phẩm kiểm tra tồn kho thành công'
 }
 
 export const MEDIA_MESSAGES = {
@@ -170,5 +182,26 @@ export const CARTS_MESSAGES = {
 
 export const ORDERS_MESSAGES = {
   ORDER_PENDING: 'Đang chờ xử lý',
-  ORDER_SUCCESS: 'Đặt hàng thành công'
-}
+  ORDER_SUCCESS: 'Đặt hàng thành công',
+  GET_ORDERS_SUCCESS: 'Lấy danh sách đơn hàng thành công'
+} as const
+
+export const VOUCHERS_MESSAGES = {
+  GET_VOUCHERS_SUCCESS: 'Lấy danh sách voucher thành công',
+  CREATE_SUCCESS: 'Tạo voucher thành công',
+  UPDATE_SUCCESS: 'Cập nhật voucher thành công',
+  DELETE_SUCCESS: 'Xóa voucher thành công',
+  VOUCHER_NOT_FOUND: 'Voucher không tồn tại',
+  VOUCHER_IS_EXISTS: 'Voucher đã tồn tại',
+  SAVE_VOUCHER_SUCCESS: 'Áp dụng voucher thành công',
+  VOUCHER_IS_NOT_EXISTS: 'Voucher không tồn tại hoặc đã hết hạn sử dụng',
+  VOUCHERS_NOT_IS_EXISTS: 'Voucher không tồn tại',
+  VOUCHER_IS_EXPIRED: 'Voucher đã hết hạn',
+  VOUCHER_IS_SAVED: 'Voucher đã được lưu trước đó',
+  VOUCHER_IS_USED: 'Voucher đã được sử dụng'
+} as const
+
+export const PURCHASE_ORDER_MESSAGES = {
+  CREATE_PURCHASE_ORDER_SUCCESS: 'Nhập hàng thành công',
+  DELETE_PURCHASE_ORDER_SUCCESS: 'Xóa đơn nhập hàng thành công',
+} as const

@@ -53,8 +53,25 @@ export const getMeUserController = async (req: Request, res: Response, next: Nex
   return
 }
 
+export const changePasswordUserController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { new_password } = req.body
+  await usersService.changePassword({
+    user_id,
+    new_password
+  })
+  res.json({
+    message: USERS_MESSAGES.CHANGE_PASSWORD_SUCCESS
+  })
+  return
+}
+
 export const getAllUsersController = async (req: Request, res: Response, next: NextFunction) => {
-  const result = await usersService.getAllUsers()
+  const key_search = req.query.key_search as string
+  const status = req.query.status as string
+  const dateStart = req.query.dateStart as string
+  const dateEnd = req.query.dateEnd as string
+  const result = await usersService.getAllUsers({ key_search, status, dateStart, dateEnd })
   res.json({
     message: USERS_MESSAGES.GET_ALL_USERS_SUCCESS,
     result
@@ -67,6 +84,7 @@ export const changeStatusUserController = async (
   next: NextFunction
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
+
   const { user_id_change, status } = req.body
   await usersService.changeStatusUser({
     user_id,
@@ -121,8 +139,22 @@ export const deleteUserController = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { user_id } = req.body
+  await usersService.deleteUserController(user_id)
+
   res.json({
     message: USERS_MESSAGES.DELETE_SUCCESS
+  })
+  return
+}
+
+export const exportFileUserController = async (req: Request, res: Response, next: NextFunction) => {
+  const user_ids = req.body.user_ids as string[]
+  const result = await usersService.exportFileUser({ user_ids, res })
+
+  res.json({
+    message: USERS_MESSAGES.DELETE_SUCCESS,
+    result
   })
   return
 }

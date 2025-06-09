@@ -26,11 +26,12 @@ export enum MediaType {
 }
 
 export enum OrderStatus {
-  Pending, // Đang chờ xử lý - 1
-  Confirmed, // Đã xác nhận - 2
-  Processing, // Đang xử lý - 3
-  Shipping, // Đang giao hàng - 4
-  Completed, // Đã giao hàng - 5
+  WaitPayment, // Chờ thanh toán - 0
+  WaitConfirmed, // Chờ xác nhận - 1
+  WaitForGetting, // Chờ lấy hàng - 2
+  WaitDelivery, // Đang giao hàng - 3
+  OnDelevery, // Đang giao hàng - 4
+  Success, // Đã giao hàng - 5
   Canceled // Đã hủy - 6
 }
 
@@ -59,4 +60,27 @@ export enum VnPayStatus {
 export enum StatusType {
   Inactive,
   Active
+}
+
+export enum isDefault {
+  False,
+  True
+}
+
+export enum IsUsed {
+  False, // 0
+  True // 1
+}
+
+export enum GenderType {
+  Women, // Nữ 0
+  Men, // Nam 1
+  Unisex, //  Nam và nữ 2
+  All // Tất cả 3
+}
+
+export enum TargetType {
+  Kid, // Trẻ em 0
+  Adult, // Người lớn 1
+  All // Tất cả 2
 }

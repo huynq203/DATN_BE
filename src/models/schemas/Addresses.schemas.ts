@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb'
+import { isDefault } from '~/constants/enums'
 
 interface AddressType {
   _id?: ObjectId
@@ -6,6 +7,7 @@ interface AddressType {
   name: string
   phone: string
   address: string
+  isDefault: isDefault
   created_at?: Date
   updated_at?: Date
 }
@@ -16,6 +18,7 @@ export default class Address {
   name: string
   phone: string
   address: string
+  isDefault?: isDefault
   created_at: Date
   updated_at: Date
   constructor(address: AddressType) {
@@ -24,6 +27,7 @@ export default class Address {
     this.name = address.name
     this.phone = address.phone
     this.address = address.address
+    this.isDefault = address.isDefault
     this.created_at = address.created_at || new Date()
     this.updated_at = address.updated_at || new Date()
   }

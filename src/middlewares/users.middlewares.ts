@@ -1,12 +1,63 @@
-import { checkSchema } from 'express-validator'
-import { COMMONS_MESSAGES } from '~/constants/messages'
+import { checkSchema, ParamSchema } from 'express-validator'
+import { COMMONS_MESSAGES, USERS_MESSAGES } from '~/constants/messages'
 import { validate } from '~/utils/validation'
 import { confirmPasswordSchema, dateOfBirthSchema, nameSchema, passwordSchema } from './commons.middlewares'
 import usersService from '~/services/users.services'
 import databaseService from '~/services/database.services'
 import { hashPassword } from '~/utils/crypto'
 import { StatusType } from '~/constants/enums'
+import { TokenPayload } from '~/models/requests/Customer.requests'
+import { ObjectId } from 'mongodb'
 
+const NewPasswordSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED
+  },
+  isString: {
+    errorMessage: USERS_MESSAGES.PASSWORD_MUST_BE_A_STRING
+  },
+  isLength: {
+    options: {
+      min: 6,
+      max: 50
+    },
+    errorMessage: USERS_MESSAGES.PASSWORD_LENGHT_MUST_BE_FROM_6_to_50
+  },
+  isStrongPassword: {
+    options: {
+      minLength: 1,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1
+    },
+    errorMessage: USERS_MESSAGES.PASSWORD_NEW_MUST_BE_STRONG
+  }
+}
+
+const confirmNewPasswordSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: USERS_MESSAGES.CONFIRM_PASSWORD_IS_REQUIRED
+  },
+  isString: {
+    errorMessage: USERS_MESSAGES.CONFIRM_PASSWORD_MUST_BE_A_STRING
+  },
+  isLength: {
+    options: {
+      min: 6,
+      max: 50
+    },
+    errorMessage: USERS_MESSAGES.CONFRIM_PASSWORD_LENGTH_MUST_BE_FROM_6_TO_50
+  },
+  custom: {
+    options: (value, { req }) => {
+      if (value !== req.body.new_password) {
+        throw new Error(USERS_MESSAGES.CONFIRM_PASSWORD_MUST_BE_THE_SAME_AS_PASSWORD)
+      }
+      return true
+    }
+  }
+}
 export const loginUserValidator = validate(
   checkSchema(
     {
@@ -142,6 +193,33 @@ export const updateUserValidator = validate(
       date_of_birth: dateOfBirthSchema,
       password: passwordSchema,
       confirm_password: confirmPasswordSchema
+    },
+    ['body']
+  )
+)
+
+export const changePasswordValidatorUser = validate(
+  checkSchema(
+    {
+      old_password: {
+        ...passwordSchema,
+        custom: {
+          options: async (value, { req }) => {
+            const { user_id } = req.decoded_authorization as TokenPayload
+            const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+            if (!user) {
+              throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
+            }
+            const { password } = user
+            const isMatch = hashPassword(value) === password
+            if (!isMatch) {
+              throw new Error(USERS_MESSAGES.OLD_PASSWORD_NOT_MATCH)
+            }
+          }
+        }
+      },
+      new_password: NewPasswordSchema,
+      confirm_new_password: confirmNewPasswordSchema
     },
     ['body']
   )

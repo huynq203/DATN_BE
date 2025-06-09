@@ -3,6 +3,8 @@ import { ParamsDictionary } from 'express-serve-static-core'
 import { MEDIA_MESSAGES, PRODUCTS_MESSAGES } from '~/constants/messages'
 import { TokenPayload } from '~/models/requests/Customer.requests'
 import {
+  ChangeStatusOptionProduct,
+  ChangeStatusProduct,
   OptionProductReqBody,
   OptionProductUpdateReqBody,
   ProductReqBody,
@@ -18,8 +20,10 @@ export const getAllProductController = async (req: Request, res: Response, next:
   const rating_filter = Number(req.query.rating_filter)
   const price_max = Number(req.query.price_max) || 99999999
   const price_min = Number(req.query.price_min) || 1
-  const name = req.query.name as string
+  const key_search = req.query.key_search as string
   const category_id = req.query.category_id as string
+  const gender = Number(req.query.gender)
+  const target_person = Number(req.query.target_person)
 
   const data = await productsService.getAllProducts({
     limit: limit,
@@ -29,7 +33,9 @@ export const getAllProductController = async (req: Request, res: Response, next:
     category_id,
     price_min,
     price_max,
-    name
+    key_search,
+    gender,
+    target_person
   })
   res.json({
     message: PRODUCTS_MESSAGES.GET_PRODUCT_SUCCESS,
@@ -50,7 +56,10 @@ export const getProductByIdController = async (req: Request, res: Response, next
   const result = await productsService.getProductById(product_id)
   res.json({
     message: PRODUCTS_MESSAGES.GET_PRODUCT_SUCCESS,
-    result
+    result: {
+      product: result.product,
+      inventories: result.inventories
+    }
   })
   return
 }
@@ -101,17 +110,6 @@ export const deleteProductController = async (req: Request, res: Response, next:
   return
 }
 
-export const uploadImageByProductController = async (req: Request, res: Response, next: NextFunction) => {
-  const { user_id } = req.decoded_authorization as TokenPayload
-  const { product_id } = req.params
-  const result = await productsService.uploadImagebyProduct({ user_id, product_id, req })
-  res.json({
-    message: MEDIA_MESSAGES.UPLOAD_SUCCESS,
-    result
-  })
-  return
-}
-
 export const uploadImageProductController = async (req: Request, res: Response, next: NextFunction) => {
   const result = await productsService.uploadImageProduct({ req })
   res.json({
@@ -120,12 +118,51 @@ export const uploadImageProductController = async (req: Request, res: Response, 
   })
 }
 
+export const uploadImageVariantColorController = async (req: Request, res: Response, next: NextFunction) => {
+  const result = await productsService.uploadImageVariantColor({ req })
+  res.json({
+    message: MEDIA_MESSAGES.UPLOAD_SUCCESS,
+    result
+  })
+}
+
 export const getAllProductManagerController = async (req: Request, res: Response, next: NextFunction) => {
-  const products = await productsService.getAllProductManager()
+  const key_search = req.query.key_search as string
+  const category_id = req.query.category_id as string
+  const status = req.query.status as string
+  const gender = req.query.gender as string
+  const target_person = req.query.target_person as string
+  const price_min = Number(req.query.price_min)
+  const price_max = Number(req.query.price_max)
+
+  const result = await productsService.getAllProductManager({
+    key_search,
+    category_id,
+    status,
+    gender,
+    target_person,
+    price_min,
+    price_max
+  })
   res.json({
     message: PRODUCTS_MESSAGES.GET_PRODUCT_SUCCESS,
+    result
+  })
+}
+
+export const getAllStockOptionProductManagerByIdController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { option_product_id } = req.params
+  const result = await productsService.getAllStockOptionProductManagerById(option_product_id)
+  res.json({
+    message: PRODUCTS_MESSAGES.GET_PRODUCT_CHECK_STOCK_SUCCESS,
     result: {
-      products
+      totalStock: result.totalStock,
+      totalSold: result.totalSold,
+      inventories: result.inventories
     }
   })
 }
@@ -174,9 +211,35 @@ export const deleteOptionProductController = async (req: Request, res: Response,
 }
 
 export const exportFileProductController = async (req: Request, res: Response, next: NextFunction) => {
-  const result = await productsService.exportFile({ req, res })
+  const product_ids = req.body.product_ids as string[]
+
+  const result = await productsService.exportFile({ product_ids, res })
   res.json({
     message: PRODUCTS_MESSAGES.EXPORT_FILE_SUCCESS,
     result
+  })
+}
+
+export const changeStatusProductController = async (
+  req: Request<ParamsDictionary, any, ChangeStatusProduct>,
+  res: Response,
+  next: NextFunction
+) => {
+  await productsService.changeStatusProduct(req.body)
+
+  res.json({
+    message: PRODUCTS_MESSAGES.CHANGE_STATUS_PRODUCT_SUCCESS
+  })
+}
+
+export const changeStatusOptionProductController = async (
+  req: Request<ParamsDictionary, any, ChangeStatusOptionProduct>,
+  res: Response,
+  next: NextFunction
+) => {
+  await productsService.changeStatusOptionProduct(req.body)
+
+  res.json({
+    message: PRODUCTS_MESSAGES.CHANGE_STATUS_PRODUCT_SUCCESS
   })
 }

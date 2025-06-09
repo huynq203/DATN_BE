@@ -14,6 +14,11 @@ import Cart from '~/models/schemas/Cart.schemas'
 import OrderDetail from '~/models/schemas/OrderDetail.shemas'
 
 import OptionProduct from '~/models/schemas/OptionProduct.schemas'
+import { Voucher } from '~/models/schemas/Vouchers.schemas'
+import SaveVoucher from '~/models/schemas/SaveVouchers.schemas'
+import PurchaseOrder from '~/models/schemas/PurchaseOrders.schemas'
+import Inventory from '~/models/schemas/Inventories.schemas'
+import PurchaseOrderItem from '~/models/schemas/PurchaseOrderItems.schemas'
 dotenv.config()
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@datn.phpnw.mongodb.net/?retryWrites=true&w=majority&appName=DATN`
 class DatabaseService {
@@ -68,6 +73,21 @@ class DatabaseService {
   }
   get carts(): Collection<Cart> {
     return this.db.collection(process.env.DB_CARTS_COLLECTION as string)
+  }
+  get vouchers(): Collection<Voucher> {
+    return this.db.collection(process.env.DB_VOUCHERS_COLLECTION as string)
+  }
+  get saveVoucher(): Collection<SaveVoucher> {
+    return this.db.collection(process.env.DB_SAVE_VOUCHERS_COLLECTION as string)
+  }
+  get purchase_orders(): Collection<PurchaseOrder> {
+    return this.db.collection(process.env.DB_PURCHASE_ORDER_COLLECTION as string)
+  }
+  get purchase_orders_items(): Collection<PurchaseOrderItem> {
+    return this.db.collection(process.env.DB_PURCHASE_ORDER_ITEMS_COLLECTION as string)
+  }
+  get inventories(): Collection<Inventory> {
+    return this.db.collection(process.env.DB_INVENTORIES_COLLECTION as string)
   }
 }
 

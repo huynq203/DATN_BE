@@ -3,6 +3,7 @@ import {
   createCategoryController,
   deleteCategoryController,
   getAllCategoriesController,
+  getAllCategoriesManagerController,
   getCategoryByIdController,
   updateCategoryController
 } from '~/controllers/categories.controllers'
@@ -17,6 +18,13 @@ const categoriesRouter = Router()
  * Method: GET
  */
 categoriesRouter.get('/', wrapRequestHandler(getAllCategoriesController))
+
+/**
+ * Description: GET Category Manager
+ * Path: api/categories/
+ * Method: GET
+ */
+categoriesRouter.get('/manager', wrapRequestHandler(getAllCategoriesManagerController))
 
 /**
  * Description: GET Category By ID

@@ -6,14 +6,22 @@ import { TokenPayload } from '~/models/requests/Customer.requests'
 import categoriesService from '~/services/categories.services'
 
 export const getAllCategoriesController = async (req: Request, res: Response, next: NextFunction) => {
-  const categories = await categoriesService.getAllCategories()
+  const result = await categoriesService.getAllCategories()
   res.json({
     message: CATEGORIES_MESSAGES.GET_CATEGORY_SUCCESS,
-    result: {
-      categories
-    }
+    result
   })
   return
+}
+
+export const getAllCategoriesManagerController = async (req: Request, res: Response, next: NextFunction) => {
+  const key_search = req.query.key_search as string
+  const result = await categoriesService.getAllCategoriesManager({ key_search })
+
+  res.json({
+    message: CATEGORIES_MESSAGES.GET_CATEGORY_SUCCESS,
+    result
+  })
 }
 
 export const getCategoryByIdController = async (req: Request, res: Response, next: NextFunction) => {

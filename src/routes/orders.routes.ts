@@ -1,5 +1,7 @@
 import { Router } from 'express'
 import {
+  getOrderByCustomerController,
+  getOrderManager,
   orderCodController,
   orderMomoController,
   orderVnpayController,
@@ -8,13 +10,38 @@ import {
 import { accessTokenValidator } from '~/middlewares/commons.middlewares'
 import { verifiedCustomerValidator } from '~/middlewares/customers.middlewares'
 import { wrapRequestHandler } from '~/utils/hanlders'
-
 const ordersRouter = Router()
 
 /**
- * Description: create order
- * Path: api/orders/
+ * Description: Get Order By User
+ * Path: api/orders/get-order-by-user
+ * Method: GET
+ * Header: {Authorization: Bearer <access_token>}
+ */
+ordersRouter.get(
+  '/get-order-by-customer',
+  accessTokenValidator,
+  verifiedCustomerValidator,
+  wrapRequestHandler(getOrderByCustomerController)
+)
+
+/**
+ * Description: Get Order By User
+ * Path: api/orders/get-order-by-user
+ * Method: GET
+ * Header: {Authorization: Bearer <access_token>}
+ */
+ordersRouter.get(
+  '/get-order-manager',
+  accessTokenValidator,
+  wrapRequestHandler(getOrderManager)
+)
+
+/**
+ * Description: create order cod
+ * Path: api/orders/create-order-cod
  * Method: POST
+ * Header: {Authorization: Bearer <access_token>}
  */
 ordersRouter.post(
   '/create-order-cod',

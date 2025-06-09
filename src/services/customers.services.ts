@@ -14,6 +14,7 @@ import { ErrorWithStatus } from '~/models/Error'
 import axios from 'axios'
 import { Request, Response } from 'express'
 import ExcelJS from 'exceljs'
+import { create } from 'lodash'
 dotenv.config()
 class CustomersService {
   //Khoi tao accesstoken
@@ -456,9 +457,42 @@ class CustomersService {
     )
   }
 
-  async getAllCustomers() {
+  async getAllCustomers({
+    key_search,
+    status,
+    dateStart,
+    dateEnd
+  }: {
+    key_search: string
+    status: string
+    dateStart: string
+    dateEnd: string
+  }) {
+    const filterKeySearch = key_search
+      ? {
+          $or: [
+            { name: { $regex: key_search, $options: 'i' } },
+            { email: { $regex: key_search, $options: 'i' } },
+            { phone: { $regex: key_search, $options: 'i' } }
+          ]
+        }
+      : {}
+    const filterStatus = status ? { status: Number(status) } : {}
+    const filterDateCreated =
+      dateStart && dateEnd
+        ? {
+            created_at: {
+              $gte: new Date(dateStart),
+              $lte: new Date(dateEnd)
+            }
+          }
+        : {}
+
     const result = await databaseService.customers
       .aggregate([
+        ...(filterKeySearch ? [{ $match: filterKeySearch }] : []),
+        ...(filterStatus ? [{ $match: filterStatus }] : []),
+        ...(filterDateCreated ? [{ $match: filterDateCreated }] : []),
         {
           $lookup: {
             from: 'addresses',
@@ -564,9 +598,17 @@ class CustomersService {
       )
     }
   }
-  async exportFileCustomer({ req, res }: { req: Request; res: Response }) {
+  async exportFileCustomer({ customer_ids, res }: { customer_ids: string[]; res: Response }) {
+    const filterCustomerIds = customer_ids ? customer_ids.map((id) => new ObjectId(id)) : []
+    
+
     const customers = await databaseService.customers
       .aggregate([
+        {
+          $match: {
+            _id: { $in: filterCustomerIds }
+          }
+        },
         {
           $lookup: {
             from: 'addresses',

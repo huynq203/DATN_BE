@@ -5,6 +5,7 @@ export interface CartReqBody {
   quantity: number
   size: number
   color: string
+  cost_price: number
   status: CartStatus
 }
 

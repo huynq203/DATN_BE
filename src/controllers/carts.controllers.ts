@@ -37,7 +37,7 @@ export const addToCartController = async (
     customer_id,
     payload: req.body
   })
-
+                
   res.json({
     message: CARTS_MESSAGES.ADD_TO_CART_SUCCESS,
     result

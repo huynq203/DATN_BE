@@ -25,7 +25,11 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 export const getAllCustomersController = async (req: Request, res: Response, next: NextFunction) => {
-  const result = await customersService.getAllCustomers()
+  const key_search = req.query.key_search as string
+  const status = req.query.status as string
+  const dateStart = req.query.dateStart as string
+  const dateEnd = req.query.dateEnd as string
+  const result = await customersService.getAllCustomers({ key_search, status, dateStart, dateEnd })
   res.json({
     message: CUSTOMERS_MESSAGES.GET_ALL_CUSTOMERS_SUCCESS,
     result
@@ -224,18 +228,20 @@ export const changePasswordController = async (
   const { customer_id } = req.decoded_authorization as TokenPayload
   const { new_password } = req.body
   await customersService.changePassword(customer_id, new_password)
+
   res.json({
     message: CUSTOMERS_MESSAGES.CHANGE_PASSWORD_SUCCESS
   })
   return
 }
 
-export const changeStatusController = async (
+export const changeStatusCustomerController = async (
   req: Request<ParamsDictionary, any, ChangeStatusReqBody>,
   res: Response,
   next: NextFunction
 ) => {
   const { user_id } = req.decoded_authorization as TokenPayload
+
   const { customer_id } = req.body
   const { status } = req.body
   await customersService.changeStatus({ user_id, customer_id, status })
@@ -246,7 +252,9 @@ export const changeStatusController = async (
 }
 
 export const exportFileCustomerController = async (req: Request, res: Response, next: NextFunction) => {
-  const result = await customersService.exportFileCustomer({ req, res })
+  const customer_ids = req.body.customer_ids as string[]
+  console.log('customer_ids', customer_ids)
+  const result = await customersService.exportFileCustomer({ customer_ids, res })
   res.json({
     message: CUSTOMERS_MESSAGES.EXPORT_FILE_CUSTOMER_SUCCESS,
     result

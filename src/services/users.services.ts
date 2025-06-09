@@ -1,4 +1,4 @@
-import { RoleType, StatusType, TokenType, UserVerifyStatus } from '~/constants/enums'
+import { RoleType, StatusType, TokenType } from '~/constants/enums'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { signToken, verifyToken } from '~/utils/jwt'
 import databaseService from './database.services'
@@ -7,7 +7,8 @@ import { hashPassword } from '~/utils/crypto'
 import User from '~/models/schemas/User.schemas'
 import { CreateUserReqBody, UpdateUserReqBody } from '~/models/requests/User.requests'
 import { USERS_MESSAGES } from '~/constants/messages'
-
+import { Request, Response } from 'express'
+import ExcelJS from 'exceljs'
 class UsersService {
   //Khoi tao accesstoken
   private signAccessToken({ user_id, role }: { user_id: string; role: string }) {
@@ -118,9 +119,52 @@ class UsersService {
     return user
   }
 
-  async getAllUsers() {
+  async changePassword({ user_id, new_password }: { user_id: string; new_password: string }) {
+    await databaseService.users.updateOne({ _id: new ObjectId(user_id) }, [
+      {
+        $set: {
+          password: hashPassword(new_password),
+          updated_at: '$$NOW'
+        }
+      }
+    ])
+  }
+
+  async getAllUsers({
+    key_search,
+    status,
+    dateStart,
+    dateEnd
+  }: {
+    key_search: string
+    status: string
+    dateStart: string
+    dateEnd: string
+  }) {
+    const filterKeysearch = key_search
+      ? {
+          $or: [
+            { name: { $regex: key_search, $options: 'i' } },
+            { email: { $regex: key_search, $options: 'i' } },
+            { phone: { $regex: key_search, $options: 'i' } }
+          ]
+        }
+      : {}
+    const filterStatus = status ? { status: Number(status) } : {}
+    const filterDateCreated =
+      dateStart && dateEnd
+        ? {
+            created_at: {
+              $gte: new Date(dateStart),
+              $lte: new Date(dateEnd)
+            }
+          }
+        : {}
     const result = await databaseService.users
       .aggregate([
+        ...(filterKeysearch ? [{ $match: filterKeysearch }] : []),
+        ...(filterStatus ? [{ $match: filterStatus }] : []),
+        ...(filterDateCreated ? [{ $match: filterDateCreated }] : []),
         {
           $lookup: {
             from: 'roles',
@@ -269,6 +313,96 @@ class UsersService {
     } else {
       throw new Error(USERS_MESSAGES.YOU_NOT_HAVE_PERMISSION)
     }
+  }
+  async deleteUserController(user_id: string) {
+    await databaseService.users.deleteOne({
+      _id: new ObjectId(user_id)
+    })
+  }
+  async exportFileUser({ user_ids, res }: { user_ids: string[]; res: Response }) {
+    const filterUserIds = user_ids ? user_ids.map((id) => new ObjectId(id)) : []
+    const users = await databaseService.users
+      .aggregate([
+        {
+          $match: {
+            _id: { $in: filterUserIds }
+          }
+        },
+        {
+          $lookup: {
+            from: 'roles',
+            localField: 'role',
+            foreignField: '_id',
+            as: 'role'
+          }
+        },
+        {
+          $unwind: {
+            path: '$role'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'created_by',
+            foreignField: '_id',
+            as: 'created_by'
+          }
+        },
+        {
+          $unwind: {
+            path: '$created_by'
+          }
+        },
+        {
+          $sort: {
+            created_at: -1
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            email: 1,
+            phone: 1,
+            date_of_birth: 1,
+            address: 1,
+            role: {
+              _id: '$role._id',
+              role_name: '$role.role_name'
+            },
+            created_by: {
+              _id: '$created_by._id',
+              name: '$created_by.name'
+            },
+            status: 1,
+            created_at: 1,
+            updated_at: 1
+          }
+        }
+      ])
+      .toArray()
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Users')
+    worksheet.columns = [
+      { header: 'ID', key: '_id', width: 30 },
+      { header: 'Name', key: 'name', width: 30 },
+      { header: 'Email', key: 'email', width: 30 },
+      { header: 'Phone', key: 'phone', width: 15 },
+      { header: 'Date of Birth', key: 'date_of_birth', width: 20 },
+      { header: 'Address', key: 'address', width: 30 },
+      { header: 'Role', key: 'role', width: 20 },
+      { header: 'Created By', key: 'created_by', width: 30 },
+      { header: 'Status', key: 'status', width: 15 },
+      { header: 'Created At', key: 'created_at', width: 20 },
+      { header: 'Updated At', key: 'updated_at', width: 20 }
+    ]
+    users.forEach((item) => {
+      worksheet.addRow(item)
+    })
+    const result = await workbook.xlsx.write(res)
+    res.end()
+    return result
   }
 }
 

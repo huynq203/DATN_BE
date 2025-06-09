@@ -333,18 +333,12 @@ export const changePasswordValidator = validate(
             const { customer_id } = req.decoded_authorization as TokenPayload
             const customer = await databaseService.customers.findOne({ _id: new ObjectId(customer_id) })
             if (!customer) {
-              throw new ErrorWithStatus({
-                message: CUSTOMERS_MESSAGES.CUSTOMER_NOT_FOUND,
-                status: HTTP_STATUS.NOT_FOUND
-              })
+              throw new Error(CUSTOMERS_MESSAGES.CUSTOMER_NOT_FOUND)
             }
             const { password } = customer
             const isMatch = hashPassword(value) === password
             if (!isMatch) {
-              throw new ErrorWithStatus({
-                message: CUSTOMERS_MESSAGES.OLD_PASSWORD_NOT_MATCH,
-                status: HTTP_STATUS.UNAUTHORIZED
-              })
+              throw new Error(CUSTOMERS_MESSAGES.OLD_PASSWORD_NOT_MATCH)
             }
           }
         }
